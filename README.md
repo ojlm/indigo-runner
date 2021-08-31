@@ -1,10 +1,12 @@
 
 
-# Karate Runner
+# Indigo Runner
 
-#### [Repository](https://github.com/kirksl/karate-runner)&nbsp;&nbsp;|&nbsp;&nbsp;[Issues](https://github.com/kirksl/karate-runner/issues)&nbsp;&nbsp;|&nbsp;&nbsp;[Milestones](https://github.com/kirksl/karate-runner/milestones)&nbsp;&nbsp;|&nbsp;&nbsp;[Karate Documentation](https://github.com/intuit/karate)
+> forked and modified from: https://github.com/kirksl/karate-runner
 
-![Badge](https://img.shields.io/visual-studio-marketplace/v/kirkslota.karate-runner) ![Badge](https://img.shields.io/visual-studio-marketplace/last-updated/kirkslota.karate-runner) ![Badge](https://img.shields.io/github/issues/kirksl/karate-runner)
+#### [Repository](https://github.com/ojlm/indigo-runner)&nbsp;&nbsp;|&nbsp;&nbsp;[Issues](https://github.com/ojlm/indigo-runner/issues)&nbsp;&nbsp;|&nbsp;&nbsp;[Documentation](https://ojlm.tech/)
+
+![Badge](https://img.shields.io/visual-studio-marketplace/v/ojlm.indigo-runner) ![Badge](https://img.shields.io/visual-studio-marketplace/last-updated/ojlm.indigo-runner) ![Badge](https://img.shields.io/github/issues/ojlm/indigo-runner)
 
 Open/Run/Debug Karate Tests and Reports by leveraging Codelens, Activity Bar, Debugger and much more.
 

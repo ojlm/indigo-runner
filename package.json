@@ -1,688 +1,711 @@
 {
-	"name": "karate-runner",
-	"displayName": "Karate Runner",
-	"description": "Open/Run/Debug Karate Tests and Reports by leveraging Codelens, Activity Bar, Debugger and much more.",
-	"icon": "resources/karate.png",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/kirksl/karate-runner"
-	},
-	"version": "1.0.9",
-	"license": "MIT",
-	"author": {
-		"name": "Kirk Slota"
-	},
-	"publisher": "kirkslota",
-	"engines": {
-		"vscode": "^1.58.0"
-	},
-	"categories": [
-		"Other"
-	],
-	"keywords": [
-		"karate",
-		"intuit",
-		"rest",
-		"api",
-		"gatling"
-	],
-	"activationEvents": [
-		"onLanguage:karate",
-		"onLanguage:javascript",
-		"onView:karate-reports",
-		"onView:karate-tests"
-	],
-	"main": "./out/extension",
-	"capabilities": {
-		"untrustedWorkspaces": {
-			"supported": true
-		}
-	},
-	"contributes": {
-		"viewsContainers": {
-			"activitybar": [
-				{
-					"id": "karate-runner",
-					"title": "Karate Runner",
-					"icon": "resources/karate-activitybar.svg"
-				}
-			]
-		},
-		"views": {
-			"karate-runner": [
-				{
-					"id": "karate-reports",
-					"name": "Reports",
-					"when": "workbenchState != empty"
-				},
-				{
-					"id": "karate-tests",
-					"name": "Tests",
-					"when": "workbenchState != empty"
-				},
-				{
-					"id": "karate-welcome",
-					"name": "Welcome",
-					"when": "workbenchState == empty"
-				}
-			]
-		},
-		"viewsWelcome": [
-			{
-				"view": "karate-welcome",
-				"contents": "Karate Runner\nIn order to use this extension you must open a folder containing a Karate project or clone from a URL.\n[Open Folder](command:vscode.openFolder)\n[Clone Repository](command:git.clone)\n\nLearn more about [this extension](https://marketplace.visualstudio.com/items?itemName=kirkslota.karate-runner) and [Karate](https://github.com/intuit/karate)."
-			}
-		],
-		"commands": [
-			{
-				"command": "karateRunner.paste",
-				"title": "Karate Smart Paste"
-			},
-			{
-				"command": "karateRunner.getDebugFile",
-				"title": "Get File To Debug"
-			},
-			{
-				"command": "karateRunner.getDebugBuildFile",
-				"title": "Get Build File To Debug"
-			},
-			{
-				"command": "karateRunner.reports.open",
-				"title": "Open Build Report"
-			},
-			{
-				"command": "karateRunner.reports.refreshTree",
-				"title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
-			},
-			{
-				"command": "karateRunner.reports.displayList",
-				"title": "Display List",
-				"icon": {
-					"light": "resources/light/display-tree.svg",
-					"dark": "resources/dark/display-tree.svg"
-				}
-			},
-			{
-				"command": "karateRunner.reports.displayTree",
-				"title": "Display Tree",
-				"icon": {
-					"light": "resources/light/display-list.svg",
-					"dark": "resources/dark/display-list.svg"
-				}
-			},
-			{
-				"command": "karateRunner.reports.filterTree",
-				"title": "Filter",
-				"icon": {
-					"light": "resources/light/filter.svg",
-					"dark": "resources/dark/filter.svg"
-				}
-			},
-			{
-				"command": "karateRunner.tests.clearResults",
-				"title": "Clear Results",
-				"icon": {
-					"light": "resources/light/clear-all.svg",
-					"dark": "resources/dark/clear-all.svg"
-				}
-			},
-			{
-				"command": "karateRunner.tests.refreshTree",
-				"title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
-			},
-			{
-				"command": "karateRunner.tests.displayList",
-				"title": "Display List",
-				"icon": {
-					"light": "resources/light/display-tag.svg",
-					"dark": "resources/dark/display-tag.svg"
-				}
-			},
-			{
-				"command": "karateRunner.tests.displayTree",
-				"title": "Display Tree",
-				"icon": {
-					"light": "resources/light/display-list.svg",
-					"dark": "resources/dark/display-list.svg"
-				}
-			},
-			{
-				"command": "karateRunner.tests.displayTag",
-				"title": "Display Tags",
-				"icon": {
-					"light": "resources/light/display-tree.svg",
-					"dark": "resources/dark/display-tree.svg"
-				}
-			},
-			{
-				"command": "karateRunner.tests.filterTree",
-				"title": "Filter",
-				"icon": {
-					"light": "resources/light/filter.svg",
-					"dark": "resources/dark/filter.svg"
-				}
-			},
-			{
-				"command": "karateRunner.tests.openSettings",
-				"title": "Open Settings",
-				"icon": {
-					"light": "resources/light/gear.svg",
-					"dark": "resources/dark/gear.svg"
-				}
-			},
-			{
-				"command": "karateRunner.tests.open",
-				"title": "Open In Editor",
-				"icon": {
-					"light": "resources/light/open-file.svg",
-					"dark": "resources/dark/open-file.svg"
-				}
-			},
-			{
-				"command": "karateRunner.tests.run",
-				"title": "Run Test",
-				"icon": {
-					"light": "resources/light/run.svg",
-					"dark": "resources/dark/run.svg"
-				}
-			},
-			{
-				"command": "karateRunner.tests.runTag",
-				"title": "Run All Tests",
-				"icon": {
-					"light": "resources/light/run-all.svg",
-					"dark": "resources/dark/run-all.svg"
-				}
-			},
-			{
-				"command": "karateRunner.tests.runAll",
-				"title": "Run All Tests",
-				"icon": {
-					"light": "resources/light/run-all.svg",
-					"dark": "resources/dark/run-all.svg"
-				}
-			},
-			{
-				"command": "karateRunner.tests.debug",
-				"title": "Debug Test",
-				"icon": {
-					"light": "resources/light/debug-alt-small.svg",
-					"dark": "resources/dark/debug-alt-small.svg"
-				}
-			},
-			{
-				"command": "karateRunner.tests.debugAll",
-				"title": "Debug All Tests",
-				"icon": {
-					"light": "resources/light/debug-alt-small.svg",
-					"dark": "resources/dark/debug-alt-small.svg"
-				}
-			},
-			{
-				"command": "karateRunner.editor.toggleResultsInGutter",
-				"title": "Toggle Results In Gutter"
-			}
-		],
-		"menus": {
-			"view/title": [
-				{
-					"command": "karateRunner.reports.refreshTree",
-					"when": "view == karate-reports",
-					"group": "navigation@1"
-				},
-				{
-					"command": "karateRunner.reports.displayList",
-					"when": "view == karate-reports && config.karateRunner.reports.activityBarDisplayType =~ /^Tree$|^Deep$/",
-					"group": "navigation@2"
-				},
-				{
-					"command": "karateRunner.reports.displayTree",
-					"when": "view == karate-reports && config.karateRunner.reports.activityBarDisplayType =~ /^List$|^Shallow$/",
-					"group": "navigation@2"
-				},
-				{
-					"command": "karateRunner.reports.filterTree",
-					"when": "view == karate-reports",
-					"group": "navigation@3"
-				},
-				{
-					"command": "karateRunner.tests.clearResults",
-					"when": "view == karate-tests",
-					"group": "navigation@1"
-				},
-				{
-					"command": "karateRunner.tests.refreshTree",
-					"when": "view == karate-tests",
-					"group": "navigation@2"
-				},
-				{
-					"command": "karateRunner.tests.displayList",
-					"when": "view == karate-tests && config.karateRunner.tests.activityBarDisplayType == Tag",
-					"group": "navigation@3"
-				},
-				{
-					"command": "karateRunner.tests.displayTree",
-					"when": "view == karate-tests && config.karateRunner.tests.activityBarDisplayType =~ /^List$|^Shallow$/",
-					"group": "navigation@3"
-				},
-				{
-					"command": "karateRunner.tests.displayTag",
-					"when": "view == karate-tests && config.karateRunner.tests.activityBarDisplayType =~ /^Tree$|^Deep$/",
-					"group": "navigation@3"
-				},
-				{
-					"command": "karateRunner.tests.filterTree",
-					"when": "view == karate-tests",
-					"group": "navigation@4"
-				},
-				{
-					"command": "karateRunner.tests.openSettings",
-					"when": "view == karate-tests",
-					"group": "navigation@5"
-				}
-			],
-			"view/item/context": [
-				{
-					"command": "karateRunner.tests.runTag",
-					"when": "view == karate-tests && viewItem == testTag",
-					"group": "inline"
-				},
-				{
-					"command": "karateRunner.tests.runAll",
-					"when": "view == karate-tests && viewItem == testDirectory",
-					"group": "inline"
-				},
-				{
-					"command": "karateRunner.tests.runAll",
-					"when": "view == karate-tests && viewItem == testFile",
-					"group": "inline@1"
-				},
-				{
-					"command": "karateRunner.tests.debugAll",
-					"when": "view == karate-tests && viewItem == testFile",
-					"group": "inline@2"
-				},
-				{
-					"command": "karateRunner.tests.open",
-					"when": "view == karate-tests && viewItem == testFile",
-					"group": "inline@3"
-				},
-				{
-					"command": "karateRunner.tests.open",
-					"when": "view == karate-tests && viewItem == testFileIgnored",
-					"group": "inline@1"
-				},
-				{
-					"command": "karateRunner.tests.runAll",
-					"when": "view == karate-tests && viewItem == testFeature",
-					"group": "inline@1"
-				},
-				{
-					"command": "karateRunner.tests.debugAll",
-					"when": "view == karate-tests && viewItem == testFeature",
-					"group": "inline@2"
-				},
-				{
-					"command": "karateRunner.tests.run",
-					"when": "view == karate-tests && viewItem == testScenario",
-					"group": "inline@1"
-				},
-				{
-					"command": "karateRunner.tests.debug",
-					"when": "view == karate-tests && viewItem == testScenario",
-					"group": "inline@2"
-				}
-			],
-			"editor/title": [
-				{
-					"submenu": "KarateRunner.editor.menu",
-					"when": "resourceLangId == karate",
-					"group": "navigation@100"
-				}
-			],
-			"KarateRunner.editor.menu": [
-				{
-					"command": "karateRunner.tests.clearResults",
-					"when": "resourceLangId == karate",
-					"group": "navigation@1"
-				},
-				{
-					"command": "karateRunner.tests.openSettings",
-					"when": "resourceLangId == karate",
-					"group": "navigation@2"
-				},
-				{
-					"command": "karateRunner.editor.toggleResultsInGutter",
-					"when": "resourceLangId == karate",
-					"group": "navigation@3"
-				}
-			]
-		},
-		"submenus": [
-			{
-				"id": "KarateRunner.editor.menu",
-				"label": "Editor Settings",
-				"icon": {
-					"dark": "resources/dark/karate-editor.svg",
-					"light": "resources/light/karate-editor.svg"
-				}
-			}
-		],
-		"configuration": {
-			"type": "object",
-			"title": "Karate Runner",
-			"properties": {
-				"karateRunner.karateJar.commandLineArgs": {
-					"type": "string",
-					"default": "java -cp karate.jar com.intuit.karate.Main",
-					"description": "Karate.jar command line.  Karate Runner will handle setting the command line with the feature file being tested and suffixing the feature file with a ':number' when running individual Scenarios.  Only applies when using Karate.jar.",
-					"scope": "resource"
-				},
-				"karateRunner.karateCli.overrideKarateRunner": {
-					"type": "boolean",
-					"default": false,
-					"description": "Override Karate Runner utilizing the new Karate Cli.  See 'Karate Cli' section within Extension Details in the Marketplace for further information.  Only applies when using Maven or Gradle.",
-					"scope": "resource"
-				},
-				"karateRunner.karateCli.commandLineArgs": {
-					"type": "string",
-					"default": "",
-					"description": "Karate Cli command line.  Karate Cli specific arguments are specified here as defined at https://github.com/intuit/karate/wiki/Debug-Server#karate-options.  Only applies when using Maven or Gradle.",
-					"scope": "resource"
-				},
-				"karateRunner.karateRunner.commandLineArgs": {
-					"type": "string",
-					"default": "",
-					"description": "Karate Runner command line.  Arguments accepted by Maven or Gradle are specified here such as JVM args.  Karate Runner will handle build commands, setting the command line with the feature file being tested and suffixing the feature file with a ':number' when running individual Scenarios.  Only applies when using Maven or Gradle.",
-					"scope": "resource"
-				},
-				"karateRunner.karateRunner.default": {
-					"type": "string",
-					"default": "_SyncRunner",
-					"description": "Default Karate Runner to use for running Karate tests.  Only applies when using Maven or Gradle.",
-					"scope": "resource"
-				},
-				"karateRunner.karateRunner.promptToSpecify": {
-					"type": "boolean",
-					"default": true,
-					"description": "Prompt to specify Karate Runner before running Karate tests.  Only applies when using Maven or Gradle.",
-					"scope": "resource"
-				},
-				"karateRunner.buildDirectory.cleanBeforeEachRun": {
-					"type": "boolean",
-					"default": true,
-					"description": "Clean build directory before running Karate tests.  Only applies when using Maven or Gradle.",
-					"scope": "resource"
-				},
-				"karateRunner.buildSystem.useWrapper": {
-					"type": "boolean",
-					"default": false,
-					"description": "Use build system wrapper.  Only applies when using Maven or Gradle.",
-					"scope": "resource"
-				},
-				"karateRunner.reports.openAfterEachRun": {
-					"type": "boolean",
-					"default": false,
-					"description": "Open reports in default program after running Karate tests.",
-					"scope": "resource"
-				},
-				"karateRunner.reports.toTargetByGlob": {
-					"type": "string",
-					"default": "**/{karate-reports/karate-*,**/gatling/*/index,lcov-report/index,jacoco/test/html/index,jacoco/index,cucumber-html-reports/overview-features,surefire-reports/timeline}.htm*",
-					"description": "Display reports targeted by glob pattern within Activity Bar.",
-					"scope": "resource"
-				},
-				"karateRunner.reports.activityBarDisplayType": {
-					"type": "string",
-					"default": "List",
-					"enum": [
-						"List",
-						"Tree"
-					],
-					"description": "Display reports as a list (List) or natural directory structure (Tree) within Activity Bar.",
-					"scope": "resource"
-				},
-				"karateRunner.debugger.serverPortTimeout": {
-					"type": "number",
-					"default": 60,
-					"description": "Default time (seconds) to wait for debug server to start.",
-					"scope": "resource"
-				},
-				"karateRunner.statusBar.colorOnFailureThreshold": {
-					"type": "string",
-					"default": "100%",
-					"enum": [
-						"10%",
-						"20%",
-						"30%",
-						"40%",
-						"50%",
-						"60%",
-						"70%",
-						"80%",
-						"90%",
-						"100%"
-					],
-					"description": "Color status bar background red when reaching failure threshold.",
-					"scope": "resource"
-				},
-				"karateRunner.executionHistory.limit": {
-					"type": "number",
-					"default": 50,
-					"description": "Maximum number of executions to store and re-execute from Karate status bar.",
-					"scope": "resource"
-				},
-				"karateRunner.tests.toTargetByGlob": {
-					"type": "string",
-					"default": "**/src/test/**/*.feature",
-					"description": "Display Karate tests targeted by glob pattern within Activity Bar.",
-					"scope": "resource"
-				},
-				"karateRunner.tests.toTargetByTag": {
-					"type": "string",
-					"default": "",
-					"description": "Display Karate tests targeted by tags within Activity Bar.",
-					"scope": "resource"
-				},
-				"karateRunner.tests.hideIgnored": {
-					"type": "boolean",
-					"default": false,
-					"description": "Hide Karate tests annotated with @ignore tag within Activity Bar.",
-					"scope": "resource"
-				},
-				"karateRunner.tests.activityBarDisplayType": {
-					"type": "string",
-					"default": "List",
-					"enum": [
-						"List",
-						"Tree",
-						"Tag"
-					],
-					"description": "Display Karate tests as a list (List), natural directory structure (Tree) or as a tag list (Tag) within Activity Bar.",
-					"scope": "resource"
-				},
-				"karateRunner.editor.toggleResultsInGutter": {
-					"type": "boolean",
-					"default": true,
-					"description": "Toggle showing results within the editor's gutter for feature files.",
-					"scope": "resource"
-				}
-			}
-		},
-		"breakpoints": [
-			{
-				"language": "karate"
-			}
-		],
-		"debuggers": [
-			{
-				"type": "karate",
-				"label": "Karate (debug)",
-				"configurationAttributes": {
-					"launch": {
-						"required": [
-							"feature",
-							"karateCli"
-						],
-						"properties": {
-							"feature": {
-								"type": "string",
-								"description": "[feature]\n\nThis property is used to find project root if multiple projects are loaded in IDE.\nAdditionally used by Karate Debug Server if [karateOptions] property not specified.\n\nRecommend default setting which finds feature files opened in IDE.",
-								"default": "^\"\\${command:karateRunner.getDebugFile}\""
-							},
-							"karateOptions": {
-								"type": "string",
-								"description": "[karateOptions]\n\nThis property is used only by Karate Debug Server.\nOverrides [feature] property to enable advanced debugging and specifying all Karate Options(classpath, threads, tags).",
-								"default": ""
-							},
-							"karateCli": {
-								"type": "string",
-								"description": "[karateCli]\n\nThis property specifies the command to start Karate Debug Server.",
-								"default": "${config:karateRunner.karateJar.commandLineArgs} -d"
-							},
-							"debugPreStep": {
-								"type": "string",
-								"description": "[debugPreStep]\n\nThis property specifies the command Karate Debug Server should run before resuming execution of the debug session.\nTypically used by Karate-Robot to switch focus to the application under test.",
-								"default": "input(Key.ALT + Key.TAB)"
-							}
-						}
-					}
-				},
-				"configurationSnippets": [
-					{
-						"label": "Karate (debug): Maven",
-						"description": "Karate (debug) for a Maven project",
-						"body": {
-							"type": "karate",
-							"name": "Karate (debug): Maven",
-							"request": "launch",
-							"feature": "^\"\\${command:karateRunner.getDebugFile}\"",
-							"karateOptions": "",
-							"karateCli": "^\"mvn test-compile -f \\\"\\${command:karateRunner.getDebugBuildFile}\\\" exec:java -Dexec.mainClass=com.intuit.karate.cli.Main -Dexec.args=\\\"-d\\\" -Dexec.classpathScope=\\\"test\\\" \\${config:karateRunner.karateRunner.commandLineArgs}\""
-						}
-					},
-					{
-						"label": "Karate (debug): Gradle",
-						"description": "Karate (debug) for a Gradle project",
-						"body": {
-							"type": "karate",
-							"name": "Karate (debug): Gradle",
-							"request": "launch",
-							"feature": "^\"\\${command:karateRunner.getDebugFile}\"",
-							"karateOptions": "",
-							"karateCli": "^\"gradle compileTestJava -b \\\"\\${command:karateRunner.getDebugBuildFile}\\\" karateExecute -DmainClass=com.intuit.karate.cli.Main --args=\\\"-d\\\" \\${config:karateRunner.karateRunner.commandLineArgs}\""
-						}
-					}
-				]
-			}
-		],
-		"keybindings": [
-			{
-				"command": "karateRunner.paste",
-				"key": "Ctrl+V",
-				"linux": "Ctrl+Shift+V",
-				"mac": "Cmd+V",
-				"when": "editorTextFocus && editorLangId == karate"
-			},
-			{
-				"command": "karateRunner.tests.run",
-				"args": null,
-				"key": "Ctrl+R Ctrl+1",
-				"linux": "Ctrl+Shift+R Ctrl+Shift+1",
-				"mac": "Cmd+R Cmd+1",
-				"when": "editorTextFocus && editorLangId == karate"
-			},
-			{
-				"command": "karateRunner.tests.runAll",
-				"args": null,
-				"key": "Ctrl+R Ctrl+A",
-				"linux": "Ctrl+Shift+R Ctrl+Shift+A",
-				"mac": "Cmd+R Cmd+A",
-				"when": "editorTextFocus && editorLangId == karate"
-			}
-		],
-		"languages": [
-			{
-				"id": "karate",
-				"aliases": [
-					"Karate",
-					"karate"
-				],
-				"extensions": [
-					".feature"
-				],
-				"configuration": "./karate-language-configuration.json"
-			},
-			{
-				"id": "karate-json",
-				"configuration": "./karate-json-language-configuration.json"
-			}
-		],
-		"grammars": [
-			{
-				"language": "karate",
-				"scopeName": "source.karate",
-				"path": "./syntaxes/karate.tmLanguage.json",
-				"embeddedLanguages": {
-					"meta.embedded.block.javascript": "javascript",
-					"meta.embedded.block.json": "karate-json",
-					"meta.embedded.block.xml": "xml"
-				}
-			},
-			{
-				"language": "karate-json",
-				"scopeName": "source.json.karate",
-				"path": "./syntaxes/karate-json.tmLanguage.json"
-			},
-			{
-				"scopeName": "source.placeholder.karate",
-				"path": "./syntaxes/karate-placeholder.tmLanguage.json",
-				"injectTo": [
-					"source.karate"
-				]
-			},
-			{
-				"scopeName": "source.js.karate",
-				"path": "./syntaxes/karate-js.tmLanguage.json",
-				"injectTo": [
-					"source.js",
-					"source.karate"
-				]
-			}
-		]
-	},
-	"scripts": {
-		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
-		"pretest": "npm run compile",
-		"test": "node ./out/test/runTest.js"
-	},
-	"devDependencies": {
-		"@types/glob": "^7.1.1",
-		"@types/mocha": "^5.2.7",
-		"@types/node": "^14.16.0",
-		"@types/vscode": "^1.58.0",
-		"glob": "^7.1.4",
-		"js-yaml": "^3.13.1",
-		"mocha": "^7.1.2",
-		"tslint": "^6.1.2",
-		"typescript": "^4.3.5",
-		"vscode-test": "^1.1.0"
-	},
-	"dependencies": {
-		"fs-extra": "^8.1.0",
-		"mkdirp": "^1.0.4",
-		"open": "^8.2.0",
-		"parse-curl": "0.2.6",
-		"rimraf": "^2.6.3"
-	}
+  "name": "indigo-runner",
+  "displayName": "Indigo",
+  "description": "Open/Run/Debug Karate/Indigo Tests and Reports by leveraging Codelens, Activity Bar, Debugger and much more.",
+  "icon": "resources/indigo.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ojlm/indigo-runner"
+  },
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": {
+    "name": "Kirk Slota"
+  },
+  "publisher": "ojlm",
+  "engines": {
+    "vscode": "^1.58.0"
+  },
+  "categories": [
+    "Testing"
+  ],
+  "keywords": [
+    "indigo",
+    "karate",
+    "intuit",
+    "rest",
+    "api",
+    "gatling"
+  ],
+  "activationEvents": [
+    "onLanguage:karate",
+    "onLanguage:javascript",
+    "onView:indigo-tests",
+    "onView:indigo-reports"
+  ],
+  "main": "./out/extension",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    }
+  },
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "indigo-runner",
+          "title": "Indigo Runner",
+          "icon": "resources/indigo-activitybar.svg"
+        }
+      ]
+    },
+    "views": {
+      "indigo-runner": [
+        {
+          "id": "indigo-tests",
+          "name": "Tests",
+          "when": "workbenchState != empty"
+        },
+        {
+          "id": "indigo-reports",
+          "name": "Reports",
+          "when": "workbenchState != empty"
+        },
+        {
+          "id": "indigo-welcome",
+          "name": "Welcome",
+          "when": "workbenchState == empty"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "indigo-welcome",
+        "contents": "Indigo Runner\nIn order to use this extension you must open a folder or clone from a URL.\n[Open Folder](command:vscode.openFolder)\n[Clone Repository](command:git.clone)"
+      }
+    ],
+    "commands": [
+      {
+        "command": "IndigoRunner.paste",
+        "title": "Smart Paste",
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.getDebugFile",
+        "title": "Get File To Debug",
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.getDebugBuildFile",
+        "title": "Get Build File To Debug",
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.reports.open",
+        "title": "Open Build Report",
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.reports.refreshTree",
+        "title": "Refresh",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        },
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.reports.displayList",
+        "title": "Display List",
+        "icon": {
+          "light": "resources/light/display-tree.svg",
+          "dark": "resources/dark/display-tree.svg"
+        },
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.reports.displayTree",
+        "title": "Display Tree",
+        "icon": {
+          "light": "resources/light/display-list.svg",
+          "dark": "resources/dark/display-list.svg"
+        },
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.reports.filterTree",
+        "title": "Filter",
+        "icon": {
+          "light": "resources/light/filter.svg",
+          "dark": "resources/dark/filter.svg"
+        },
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.tests.clearResults",
+        "title": "Clear Results",
+        "icon": {
+          "light": "resources/light/clear-all.svg",
+          "dark": "resources/dark/clear-all.svg"
+        },
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.tests.refreshTree",
+        "title": "Refresh",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        },
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.tests.displayList",
+        "title": "Display List",
+        "icon": {
+          "light": "resources/light/display-tag.svg",
+          "dark": "resources/dark/display-tag.svg"
+        },
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.tests.displayTree",
+        "title": "Display Tree",
+        "icon": {
+          "light": "resources/light/display-list.svg",
+          "dark": "resources/dark/display-list.svg"
+        },
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.tests.displayTag",
+        "title": "Display Tags",
+        "icon": {
+          "light": "resources/light/display-tree.svg",
+          "dark": "resources/dark/display-tree.svg"
+        },
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.tests.filterTree",
+        "title": "Filter",
+        "icon": {
+          "light": "resources/light/filter.svg",
+          "dark": "resources/dark/filter.svg"
+        },
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.tests.openSettings",
+        "title": "Open Settings",
+        "icon": {
+          "light": "resources/light/gear.svg",
+          "dark": "resources/dark/gear.svg"
+        },
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.tests.open",
+        "title": "Open In Editor",
+        "icon": {
+          "light": "resources/light/open-file.svg",
+          "dark": "resources/dark/open-file.svg"
+        },
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.tests.run",
+        "title": "Run Test",
+        "icon": {
+          "light": "resources/light/run.svg",
+          "dark": "resources/dark/run.svg"
+        },
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.tests.runTag",
+        "title": "Run All Tests",
+        "icon": {
+          "light": "resources/light/run-all.svg",
+          "dark": "resources/dark/run-all.svg"
+        },
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.tests.runAll",
+        "title": "Run All Tests",
+        "icon": {
+          "light": "resources/light/run-all.svg",
+          "dark": "resources/dark/run-all.svg"
+        },
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.tests.debug",
+        "title": "Debug Test",
+        "icon": {
+          "light": "resources/light/debug-alt-small.svg",
+          "dark": "resources/dark/debug-alt-small.svg"
+        },
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.tests.debugAll",
+        "title": "Debug All Tests",
+        "icon": {
+          "light": "resources/light/debug-alt-small.svg",
+          "dark": "resources/dark/debug-alt-small.svg"
+        },
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.editor.toggleResultsInGutter",
+        "title": "Toggle Results In Gutter",
+        "category": "Indigo"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "IndigoRunner.reports.refreshTree",
+          "when": "view == indigo-reports",
+          "group": "navigation@1"
+        },
+        {
+          "command": "IndigoRunner.reports.displayList",
+          "when": "view == indigo-reports && config.IndigoRunner.reports.activityBarDisplayType =~ /^Tree$|^Deep$/",
+          "group": "navigation@2"
+        },
+        {
+          "command": "IndigoRunner.reports.displayTree",
+          "when": "view == indigo-reports && config.IndigoRunner.reports.activityBarDisplayType =~ /^List$|^Shallow$/",
+          "group": "navigation@2"
+        },
+        {
+          "command": "IndigoRunner.reports.filterTree",
+          "when": "view == indigo-reports",
+          "group": "navigation@3"
+        },
+        {
+          "command": "IndigoRunner.tests.clearResults",
+          "when": "view == indigo-tests",
+          "group": "navigation@1"
+        },
+        {
+          "command": "IndigoRunner.tests.refreshTree",
+          "when": "view == indigo-tests",
+          "group": "navigation@2"
+        },
+        {
+          "command": "IndigoRunner.tests.displayList",
+          "when": "view == indigo-tests && config.IndigoRunner.tests.activityBarDisplayType == Tag",
+          "group": "navigation@3"
+        },
+        {
+          "command": "IndigoRunner.tests.displayTree",
+          "when": "view == indigo-tests && config.IndigoRunner.tests.activityBarDisplayType =~ /^List$|^Shallow$/",
+          "group": "navigation@3"
+        },
+        {
+          "command": "IndigoRunner.tests.displayTag",
+          "when": "view == indigo-tests && config.IndigoRunner.tests.activityBarDisplayType =~ /^Tree$|^Deep$/",
+          "group": "navigation@3"
+        },
+        {
+          "command": "IndigoRunner.tests.filterTree",
+          "when": "view == indigo-tests",
+          "group": "navigation@4"
+        },
+        {
+          "command": "IndigoRunner.tests.openSettings",
+          "when": "view == indigo-tests",
+          "group": "navigation@5"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "IndigoRunner.tests.runTag",
+          "when": "view == indigo-tests && viewItem == testTag",
+          "group": "inline"
+        },
+        {
+          "command": "IndigoRunner.tests.runAll",
+          "when": "view == indigo-tests && viewItem == testDirectory",
+          "group": "inline"
+        },
+        {
+          "command": "IndigoRunner.tests.runAll",
+          "when": "view == indigo-tests && viewItem == testFile",
+          "group": "inline@1"
+        },
+        {
+          "command": "IndigoRunner.tests.debugAll",
+          "when": "view == indigo-tests && viewItem == testFile",
+          "group": "inline@2"
+        },
+        {
+          "command": "IndigoRunner.tests.open",
+          "when": "view == indigo-tests && viewItem == testFile",
+          "group": "inline@3"
+        },
+        {
+          "command": "IndigoRunner.tests.open",
+          "when": "view == indigo-tests && viewItem == testFileIgnored",
+          "group": "inline@1"
+        },
+        {
+          "command": "IndigoRunner.tests.runAll",
+          "when": "view == indigo-tests && viewItem == testFeature",
+          "group": "inline@1"
+        },
+        {
+          "command": "IndigoRunner.tests.debugAll",
+          "when": "view == indigo-tests && viewItem == testFeature",
+          "group": "inline@2"
+        },
+        {
+          "command": "IndigoRunner.tests.run",
+          "when": "view == indigo-tests && viewItem == testScenario",
+          "group": "inline@1"
+        },
+        {
+          "command": "IndigoRunner.tests.debug",
+          "when": "view == indigo-tests && viewItem == testScenario",
+          "group": "inline@2"
+        }
+      ],
+      "editor/title": [
+        {
+          "submenu": "IndigoRunner.editor.menu",
+          "when": "resourceLangId == karate",
+          "group": "navigation@100"
+        }
+      ],
+      "IndigoRunner.editor.menu": [
+        {
+          "command": "IndigoRunner.tests.clearResults",
+          "when": "resourceLangId == karate",
+          "group": "navigation@1"
+        },
+        {
+          "command": "IndigoRunner.tests.openSettings",
+          "when": "resourceLangId == karate",
+          "group": "navigation@2"
+        },
+        {
+          "command": "IndigoRunner.editor.toggleResultsInGutter",
+          "when": "resourceLangId == karate",
+          "group": "navigation@3"
+        }
+      ]
+    },
+    "submenus": [
+      {
+        "id": "IndigoRunner.editor.menu",
+        "label": "Editor Settings",
+        "icon": {
+          "dark": "resources/dark/karate-editor.svg",
+          "light": "resources/light/karate-editor.svg"
+        }
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Indigo Runner",
+      "properties": {
+        "IndigoRunner.karateJar.commandLineArgs": {
+          "type": "string",
+          "default": "java -cp karate.jar com.intuit.karate.Main",
+          "description": "Karate.jar command line.  Karate Runner will handle setting the command line with the feature file being tested and suffixing the feature file with a ':number' when running individual Scenarios.  Only applies when using Karate.jar.",
+          "scope": "resource"
+        },
+        "IndigoRunner.karateCli.overrideKarateRunner": {
+          "type": "boolean",
+          "default": false,
+          "description": "Override Karate Runner utilizing the new Karate Cli.  See 'Karate Cli' section within Extension Details in the Marketplace for further information.  Only applies when using Maven or Gradle.",
+          "scope": "resource"
+        },
+        "IndigoRunner.karateCli.commandLineArgs": {
+          "type": "string",
+          "default": "",
+          "description": "Karate Cli command line.  Karate Cli specific arguments are specified here as defined at https://github.com/intuit/karate/wiki/Debug-Server#karate-options.  Only applies when using Maven or Gradle.",
+          "scope": "resource"
+        },
+        "IndigoRunner.karateRunner.commandLineArgs": {
+          "type": "string",
+          "default": "",
+          "description": "Karate Runner command line.  Arguments accepted by Maven or Gradle are specified here such as JVM args.  Karate Runner will handle build commands, setting the command line with the feature file being tested and suffixing the feature file with a ':number' when running individual Scenarios.  Only applies when using Maven or Gradle.",
+          "scope": "resource"
+        },
+        "IndigoRunner.karateRunner.default": {
+          "type": "string",
+          "default": "_SyncRunner",
+          "description": "Default Karate Runner to use for running Karate tests.  Only applies when using Maven or Gradle.",
+          "scope": "resource"
+        },
+        "IndigoRunner.karateRunner.promptToSpecify": {
+          "type": "boolean",
+          "default": true,
+          "description": "Prompt to specify Karate Runner before running Karate tests.  Only applies when using Maven or Gradle.",
+          "scope": "resource"
+        },
+        "IndigoRunner.buildDirectory.cleanBeforeEachRun": {
+          "type": "boolean",
+          "default": true,
+          "description": "Clean build directory before running Karate tests.  Only applies when using Maven or Gradle.",
+          "scope": "resource"
+        },
+        "IndigoRunner.buildSystem.useWrapper": {
+          "type": "boolean",
+          "default": false,
+          "description": "Use build system wrapper.  Only applies when using Maven or Gradle.",
+          "scope": "resource"
+        },
+        "IndigoRunner.reports.openAfterEachRun": {
+          "type": "boolean",
+          "default": false,
+          "description": "Open reports in default program after running Karate tests.",
+          "scope": "resource"
+        },
+        "IndigoRunner.reports.toTargetByGlob": {
+          "type": "string",
+          "default": "**/{karate-reports/karate-*,**/gatling/*/index,lcov-report/index,jacoco/test/html/index,jacoco/index,cucumber-html-reports/overview-features,surefire-reports/timeline}.htm*",
+          "description": "Display reports targeted by glob pattern within Activity Bar.",
+          "scope": "resource"
+        },
+        "IndigoRunner.reports.activityBarDisplayType": {
+          "type": "string",
+          "default": "List",
+          "enum": [
+            "List",
+            "Tree"
+          ],
+          "description": "Display reports as a list (List) or natural directory structure (Tree) within Activity Bar.",
+          "scope": "resource"
+        },
+        "IndigoRunner.debugger.serverPortTimeout": {
+          "type": "number",
+          "default": 60,
+          "description": "Default time (seconds) to wait for debug server to start.",
+          "scope": "resource"
+        },
+        "IndigoRunner.statusBar.colorOnFailureThreshold": {
+          "type": "string",
+          "default": "100%",
+          "enum": [
+            "10%",
+            "20%",
+            "30%",
+            "40%",
+            "50%",
+            "60%",
+            "70%",
+            "80%",
+            "90%",
+            "100%"
+          ],
+          "description": "Color status bar background red when reaching failure threshold.",
+          "scope": "resource"
+        },
+        "IndigoRunner.executionHistory.limit": {
+          "type": "number",
+          "default": 50,
+          "description": "Maximum number of executions to store and re-execute from Karate status bar.",
+          "scope": "resource"
+        },
+        "IndigoRunner.tests.toTargetByGlob": {
+          "type": "string",
+          "default": "**/src/test/**/*.feature",
+          "description": "Display Karate tests targeted by glob pattern within Activity Bar.",
+          "scope": "resource"
+        },
+        "IndigoRunner.tests.toTargetByTag": {
+          "type": "string",
+          "default": "",
+          "description": "Display Karate tests targeted by tags within Activity Bar.",
+          "scope": "resource"
+        },
+        "IndigoRunner.tests.hideIgnored": {
+          "type": "boolean",
+          "default": false,
+          "description": "Hide Karate tests annotated with @ignore tag within Activity Bar.",
+          "scope": "resource"
+        },
+        "IndigoRunner.tests.activityBarDisplayType": {
+          "type": "string",
+          "default": "List",
+          "enum": [
+            "List",
+            "Tree",
+            "Tag"
+          ],
+          "description": "Display Karate tests as a list (List), natural directory structure (Tree) or as a tag list (Tag) within Activity Bar.",
+          "scope": "resource"
+        },
+        "IndigoRunner.editor.toggleResultsInGutter": {
+          "type": "boolean",
+          "default": true,
+          "description": "Toggle showing results within the editor's gutter for feature files.",
+          "scope": "resource"
+        }
+      }
+    },
+    "breakpoints": [
+      {
+        "language": "karate"
+      }
+    ],
+    "debuggers": [
+      {
+        "type": "karate",
+        "label": "Karate (debug)",
+        "configurationAttributes": {
+          "launch": {
+            "required": [
+              "feature",
+              "karateCli"
+            ],
+            "properties": {
+              "feature": {
+                "type": "string",
+                "description": "[feature]\n\nThis property is used to find project root if multiple projects are loaded in IDE.\nAdditionally used by Karate Debug Server if [karateOptions] property not specified.\n\nRecommend default setting which finds feature files opened in IDE.",
+                "default": "^\"\\${command:IndigoRunner.getDebugFile}\""
+              },
+              "karateOptions": {
+                "type": "string",
+                "description": "[karateOptions]\n\nThis property is used only by Karate Debug Server.\nOverrides [feature] property to enable advanced debugging and specifying all Karate Options(classpath, threads, tags).",
+                "default": ""
+              },
+              "karateCli": {
+                "type": "string",
+                "description": "[karateCli]\n\nThis property specifies the command to start Karate Debug Server.",
+                "default": "${config:IndigoRunner.karateJar.commandLineArgs} -d"
+              },
+              "debugPreStep": {
+                "type": "string",
+                "description": "[debugPreStep]\n\nThis property specifies the command Karate Debug Server should run before resuming execution of the debug session.\nTypically used by Karate-Robot to switch focus to the application under test.",
+                "default": "input(Key.ALT + Key.TAB)"
+              }
+            }
+          }
+        },
+        "configurationSnippets": [
+          {
+            "label": "Karate (debug): Maven",
+            "description": "Karate (debug) for a Maven project",
+            "body": {
+              "type": "karate",
+              "name": "Karate (debug): Maven",
+              "request": "launch",
+              "feature": "^\"\\${command:IndigoRunner.getDebugFile}\"",
+              "karateOptions": "",
+              "karateCli": "^\"mvn test-compile -f \\\"\\${command:IndigoRunner.getDebugBuildFile}\\\" exec:java -Dexec.mainClass=com.intuit.karate.cli.Main -Dexec.args=\\\"-d\\\" -Dexec.classpathScope=\\\"test\\\" \\${config:IndigoRunner.karateRunner.commandLineArgs}\""
+            }
+          },
+          {
+            "label": "Karate (debug): Gradle",
+            "description": "Karate (debug) for a Gradle project",
+            "body": {
+              "type": "karate",
+              "name": "Karate (debug): Gradle",
+              "request": "launch",
+              "feature": "^\"\\${command:IndigoRunner.getDebugFile}\"",
+              "karateOptions": "",
+              "karateCli": "^\"gradle compileTestJava -b \\\"\\${command:IndigoRunner.getDebugBuildFile}\\\" karateExecute -DmainClass=com.intuit.karate.cli.Main --args=\\\"-d\\\" \\${config:IndigoRunner.karateRunner.commandLineArgs}\""
+            }
+          }
+        ]
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "IndigoRunner.paste",
+        "key": "Ctrl+V",
+        "linux": "Ctrl+Shift+V",
+        "mac": "Cmd+V",
+        "when": "editorTextFocus && editorLangId == karate"
+      },
+      {
+        "command": "IndigoRunner.tests.run",
+        "args": null,
+        "key": "Ctrl+R Ctrl+1",
+        "linux": "Ctrl+Shift+R Ctrl+Shift+1",
+        "mac": "Cmd+R Cmd+1",
+        "when": "editorTextFocus && editorLangId == karate"
+      },
+      {
+        "command": "IndigoRunner.tests.runAll",
+        "args": null,
+        "key": "Ctrl+R Ctrl+A",
+        "linux": "Ctrl+Shift+R Ctrl+Shift+A",
+        "mac": "Cmd+R Cmd+A",
+        "when": "editorTextFocus && editorLangId == karate"
+      }
+    ],
+    "languages": [
+      {
+        "id": "karate",
+        "aliases": [
+          "Karate",
+          "karate"
+        ],
+        "extensions": [
+          ".feature"
+        ],
+        "configuration": "./karate-language-configuration.json"
+      },
+      {
+        "id": "karate-json",
+        "configuration": "./karate-json-language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "karate",
+        "scopeName": "source.karate",
+        "path": "./syntaxes/karate.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.javascript": "javascript",
+          "meta.embedded.block.json": "karate-json",
+          "meta.embedded.block.xml": "xml"
+        }
+      },
+      {
+        "language": "karate-json",
+        "scopeName": "source.json.karate",
+        "path": "./syntaxes/karate-json.tmLanguage.json"
+      },
+      {
+        "scopeName": "source.placeholder.karate",
+        "path": "./syntaxes/karate-placeholder.tmLanguage.json",
+        "injectTo": [
+          "source.karate"
+        ]
+      },
+      {
+        "scopeName": "source.js.karate",
+        "path": "./syntaxes/karate-js.tmLanguage.json",
+        "injectTo": [
+          "source.js",
+          "source.karate"
+        ]
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.1.1",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^14.16.0",
+    "@types/vscode": "^1.58.0",
+    "glob": "^7.1.4",
+    "js-yaml": "^3.13.1",
+    "mocha": "^7.1.2",
+    "tslint": "^6.1.2",
+    "typescript": "^4.3.5",
+    "vscode-test": "^1.1.0"
+  },
+  "dependencies": {
+    "fs-extra": "^8.1.0",
+    "mkdirp": "^1.0.4",
+    "open": "^8.2.0",
+    "parse-curl": "0.2.6",
+    "rimraf": "^2.6.3"
+  }
 }

@@ -1,30 +1,26 @@
-import { Memento } from 'vscode';
+import { Memento } from 'vscode'
 
-export class ServiceLocalStorage
-{
-	public static instance: ServiceLocalStorage;
+export class ServiceLocalStorage {
 
-	private constructor(private storage: Memento)
-	{
-	}
+  public static instance: ServiceLocalStorage
 
-	public static initialize(storage: Memento)
-	{
-		this.instance = new ServiceLocalStorage(storage);
-	}
+  private constructor(private storage: Memento) {
+  }
 
-	public getValue<T>(key: string): T
-	{
-		return this.storage.get<T>(key, null);
-	}
+  public static initialize(storage: Memento) {
+    this.instance = new ServiceLocalStorage(storage)
+  }
 
-	public setValue<T>(key: string, value: T)
-	{
-		this.storage.update(key, value);
-	}
+  public getValue<T>(key: string): T {
+    return this.storage.get<T>(key, null)
+  }
 
-	public removeKey(key: string)
-	{
-		this.storage.update(key, undefined);
-	}
+  public setValue<T>(key: string, value: T) {
+    this.storage.update(key, value)
+  }
+
+  public removeKey(key: string) {
+    this.storage.update(key, undefined)
+  }
+
 }

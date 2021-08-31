@@ -1,57 +1,45 @@
-import * as vscode from 'vscode';
-import { ENTRY_TYPE } from "./types/entry";
+import * as vscode from 'vscode'
 
-class ProviderHoverRunDebug implements vscode.HoverProvider
-{
-	private extensionContext: vscode.ExtensionContext;
+import { ENTRY_TYPE } from './types/entry'
 
-	constructor(context: vscode.ExtensionContext)
-	{
-		this.extensionContext = context;
-	}
+class ProviderHoverRunDebug implements vscode.HoverProvider {
 
-	public provideHover(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken): vscode.ProviderResult<vscode.Hover>
-	{
-		let currentLineText = document.lineAt(position.line).text;
-		if (currentLineText.trim().startsWith('|'))
-		{
-			let previousLineText = document.lineAt(position.line - 1).text;
-			if (previousLineText.trim().startsWith('|'))
-			{
-				let currentLine = position.line - 2;
-				for (let line = currentLine; currentLine > 0; line--)
-				{
-					let lineText = document.lineAt(line).text;
-					if (!lineText.trim().startsWith('|'))
-					{
-						if (lineText.trim().startsWith('Examples:'))
-						{
-							const feature = `${document.uri.fsPath}:${position.line + 1}`;
-							const runArgs = encodeURIComponent(JSON.stringify([[{ karateOptions: feature, karateJarOptions: feature, testUri: document.uri, fileType: ENTRY_TYPE.TEST }]]));
-							const debugArgs = encodeURIComponent(JSON.stringify([[{ testUri: document.uri, debugLine: position.line + 1}]]));
-							const runCmd = `command:karateRunner.tests.run?${runArgs}`;
-							const debugCmd = `command:karateRunner.tests.debug?${debugArgs}`;
+  private extensionContext: vscode.ExtensionContext
 
-							let contents = new vscode.MarkdownString();
-							contents.isTrusted = true;
+  constructor(context: vscode.ExtensionContext) {
+    this.extensionContext = context
+  }
 
-							contents.appendMarkdown(`[Karate: Run](${runCmd} "Karate: Run")`);
-							contents.appendMarkdown(' | ');
-							contents.appendMarkdown(`[Karate: Debug](${debugCmd} "Karate: Debug")`);
-			
-							return new vscode.Hover(contents);
-						}
-						else
-						{
-							break;
-						}
-					}
-				}
-			}
-		}
-
-		return null;
-	}
+  public provideHover(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken): vscode.ProviderResult<vscode.Hover> {
+    let currentLineText = document.lineAt(position.line).text
+    if (currentLineText.trim().startsWith('|')) {
+      let previousLineText = document.lineAt(position.line - 1).text
+      if (previousLineText.trim().startsWith('|')) {
+        let currentLine = position.line - 2
+        for (let line = currentLine; currentLine > 0; line--) {
+          let lineText = document.lineAt(line).text
+          if (!lineText.trim().startsWith('|')) {
+            if (lineText.trim().startsWith('Examples:')) {
+              const feature = `${document.uri.fsPath}:${position.line + 1}`
+              const runArgs = encodeURIComponent(JSON.stringify([[{ karateOptions: feature, karateJarOptions: feature, testUri: document.uri, fileType: ENTRY_TYPE.TEST }]]))
+              const debugArgs = encodeURIComponent(JSON.stringify([[{ testUri: document.uri, debugLine: position.line + 1 }]]))
+              const runCmd = `command:IndigoRunner.tests.run?${runArgs}`
+              const debugCmd = `command:IndigoRunner.tests.debug?${debugArgs}`
+              let contents = new vscode.MarkdownString()
+              contents.isTrusted = true
+              contents.appendMarkdown(`[Karate: Run](${runCmd} "Karate: Run")`)
+              contents.appendMarkdown(' | ')
+              contents.appendMarkdown(`[Karate: Debug](${debugCmd} "Karate: Debug")`)
+              return new vscode.Hover(contents)
+            } else {
+              break
+            }
+          }
+        }
+      }
+    }
+    return null
+  }
 }
 
-export default ProviderHoverRunDebug;
+export default ProviderHoverRunDebug
