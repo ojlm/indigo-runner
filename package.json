@@ -702,6 +702,7 @@
     "vscode-test": "^1.1.0"
   },
   "dependencies": {
+    "axios": "^0.21.4",
     "fs-extra": "^8.1.0",
     "mkdirp": "^1.0.4",
     "open": "^8.2.0",
