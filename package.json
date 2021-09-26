@@ -52,6 +52,10 @@
     "views": {
       "indigo-runner": [
         {
+          "id": "indigo-remote",
+          "name": "Remote"
+        },
+        {
           "id": "indigo-tests",
           "name": "Tests",
           "when": "workbenchState != empty"
@@ -403,6 +407,36 @@
       "type": "object",
       "title": "Indigo Runner",
       "properties": {
+        "IndigoRunner.logLevel": {
+          "type": "string",
+          "enum": [
+            "error",
+            "warn",
+            "info",
+            "verbose"
+          ],
+          "default": "info",
+          "scope": "application",
+          "description": "The verbosity of logging in the Indigo output panel"
+        },
+        "IndigoRunner.remote.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Remote enabled.",
+          "scope": "application"
+        },
+        "IndigoRunner.remote.url": {
+          "type": "string",
+          "default": "http://localhost:8080",
+          "description": "Remote url.",
+          "scope": "application"
+        },
+        "IndigoRunner.remote.timeout": {
+          "type": "number",
+          "default": 10000,
+          "description": "Remote request timeout.",
+          "scope": "application"
+        },
         "IndigoRunner.karateJar.commandLineArgs": {
           "type": "string",
           "default": "java -cp karate.jar com.intuit.karate.Main",

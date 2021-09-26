@@ -30,6 +30,7 @@ import ProviderKarateTests from './providerKarateTests'
 import ProviderReports from './providerReports'
 import { ProviderResults } from './providerResults'
 import ProviderStatusBar from './providerStatusBar'
+import { RemoteProviders } from './remote/remote-providers'
 
 //import ProviderFoldingRange from "./providerFoldingRange"
 
@@ -37,6 +38,7 @@ let reportsWatcher = null
 let karateTestsWatcher = null
 
 export function activate(context: vscode.ExtensionContext) {
+  new RemoteProviders(context)
   //showWhatsNew(context)
   let resultsProvider = new ProviderResults()
   let reportsProvider = new ProviderReports()
