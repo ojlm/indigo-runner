@@ -2,10 +2,10 @@ import fs = require('fs')
 import path = require('path')
 import * as vscode from 'vscode'
 
-import { Feature, ILineToken, IUriToken } from './feature'
-import { getChildAbsolutePath, getProjectDetail, IProjectDetail } from './helper'
+import { Feature, ILineToken, IUriToken } from '../feature'
+import { getChildAbsolutePath, getProjectDetail, IProjectDetail } from '../helper'
 
-class ProviderDefinition implements vscode.DefinitionProvider {
+class DefinitionProvider implements vscode.DefinitionProvider {
 
   constructor() {
   }
@@ -104,4 +104,4 @@ class ProviderDefinition implements vscode.DefinitionProvider {
   }
 }
 
-export default ProviderDefinition
+export default DefinitionProvider

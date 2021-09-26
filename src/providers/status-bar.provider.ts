@@ -1,40 +1,40 @@
 import * as vscode from 'vscode'
 
-import ProviderExecutions from './providerExecutions'
-import { ProviderResults } from './providerResults'
+import ProviderExecutions from './executions.provider'
+import { ResultsProvider } from './results.provider'
 
-class ProviderStatusBar {
+class StatusBarProvider {
 
   private static statusBarItem: vscode.StatusBarItem
   private static statusBarCommand: vscode.Disposable
   private static statusBarCommandId: string = "IndigoRunner.tests.showExecutionHistory"
 
   constructor(context: vscode.ExtensionContext) {
-    ProviderStatusBar.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 50)
-    ProviderStatusBar.statusBarCommand = vscode.commands.registerCommand(ProviderStatusBar.statusBarCommandId, ProviderExecutions.showExecutionHistory)
-    ProviderStatusBar.statusBarItem.command = ProviderStatusBar.statusBarCommandId
-    ProviderStatusBar.statusBarItem.name = "Indigo Runner"
-    ProviderStatusBar.reset()
-    context.subscriptions.push(ProviderStatusBar.statusBarItem)
-    context.subscriptions.push(ProviderStatusBar.statusBarCommand)
-    ProviderResults.onSummaryResults((json) => { ProviderStatusBar.setFromResults(json) })
+    StatusBarProvider.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 50)
+    StatusBarProvider.statusBarCommand = vscode.commands.registerCommand(StatusBarProvider.statusBarCommandId, ProviderExecutions.showExecutionHistory)
+    StatusBarProvider.statusBarItem.command = StatusBarProvider.statusBarCommandId
+    StatusBarProvider.statusBarItem.name = "Indigo Runner"
+    StatusBarProvider.reset()
+    context.subscriptions.push(StatusBarProvider.statusBarItem)
+    context.subscriptions.push(StatusBarProvider.statusBarCommand)
+    ResultsProvider.onSummaryResults((json) => { StatusBarProvider.setFromResults(json) })
   }
 
   public static set(passed, failed, tooltip) {
-    ProviderStatusBar.statusBarItem.text = `Karate $(pass) ${passed} $(error) ${failed}`
-    ProviderStatusBar.statusBarItem.tooltip = tooltip
+    StatusBarProvider.statusBarItem.text = `Karate $(pass) ${passed} $(error) ${failed}`
+    StatusBarProvider.statusBarItem.tooltip = tooltip
     let failureActual = (passed + failed == 0) ? 0 : failed / (passed + failed)
     let failureThreshold = parseFloat(vscode.workspace.getConfiguration('IndigoRunner.statusBar').get('colorOnFailureThreshold')) / 100
     if (failureActual >= failureThreshold) {
-      ProviderStatusBar.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground')
+      StatusBarProvider.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground')
     } else {
-      ProviderStatusBar.statusBarItem.backgroundColor = undefined
+      StatusBarProvider.statusBarItem.backgroundColor = undefined
     }
-    ProviderStatusBar.statusBarItem.show()
+    StatusBarProvider.statusBarItem.show()
   }
 
   public static reset() {
-    ProviderStatusBar.set(0, 0, "No Results")
+    StatusBarProvider.set(0, 0, "No Results")
   }
 
   private static setFromResults(json) {
@@ -56,11 +56,11 @@ class ProviderStatusBar {
       tooltip = `${resultsTime}\n${resultsStats}`
     }
     if ("featuresPassed" in json) {
-      ProviderStatusBar.set(json.scenariosPassed, json.scenariosfailed, tooltip)
+      StatusBarProvider.set(json.scenariosPassed, json.scenariosfailed, tooltip)
     } else {
-      ProviderStatusBar.set(json.passed, json.failed, tooltip)
+      StatusBarProvider.set(json.passed, json.failed, tooltip)
     }
   }
 }
 
-export default ProviderStatusBar
+export default StatusBarProvider

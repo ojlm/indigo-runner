@@ -1,31 +1,31 @@
 import * as vscode from 'vscode'
 
-import { runKarateTest } from './commands'
-import { ProviderResults } from './providerResults'
+import { runKarateTest } from '../commands'
+import { ResultsProvider } from './results.provider'
 
 interface IExecutionItem {
   executionArgs: any
   quickPickItem: vscode.QuickPickItem
 }
 
-class ProviderExecutions {
+class ExecutionsProvider {
 
   private static executionHistory: IExecutionItem[] = []
   public static executionArgs: any = null
   private static summaryResultsData: any = null
 
   constructor() {
-    ProviderResults.onSummaryResults(json => {
-      ProviderExecutions.summaryResultsData = json
+    ResultsProvider.onSummaryResults(json => {
+      ExecutionsProvider.summaryResultsData = json
     })
   }
 
   public static addExecutionToHistory() {
-    let json = ProviderExecutions.summaryResultsData
+    let json = ExecutionsProvider.summaryResultsData
     if (json === null) {
       return
     }
-    if (ProviderExecutions.executionArgs === null) {
+    if (ExecutionsProvider.executionArgs === null) {
       return
     }
     let executionDate: string = `${json.lastModified}`
@@ -40,27 +40,27 @@ class ProviderExecutions {
       executionIcon = (json.failed > 0) ? `$(error) [F]` : `$(pass) [P]`
     }
     let executionItem: IExecutionItem = {
-      executionArgs: ProviderExecutions.executionArgs,
+      executionArgs: ExecutionsProvider.executionArgs,
       quickPickItem: {
         label: `${executionIcon} ${executionDate}`,
-        description: ProviderExecutions.executionArgs.karateJarOptions,
+        description: ExecutionsProvider.executionArgs.karateJarOptions,
         detail: `${executionStats}`
       }
     }
     let executionHistoryLimit: number = Number(vscode.workspace.getConfiguration('IndigoRunner.executionHistory').get('limit'))
     executionHistoryLimit = (executionHistoryLimit <= 0) ? 1 : executionHistoryLimit
-    while (ProviderExecutions.executionHistory.length >= executionHistoryLimit) {
-      ProviderExecutions.executionHistory.pop()
+    while (ExecutionsProvider.executionHistory.length >= executionHistoryLimit) {
+      ExecutionsProvider.executionHistory.pop()
     }
-    ProviderExecutions.executionHistory.unshift(executionItem)
-    ProviderExecutions.summaryResultsData = null
+    ExecutionsProvider.executionHistory.unshift(executionItem)
+    ExecutionsProvider.summaryResultsData = null
   }
 
   public static async showExecutionHistory() {
-    if (ProviderExecutions.executionHistory.length <= 0) {
+    if (ExecutionsProvider.executionHistory.length <= 0) {
       return
     }
-    let quickPickItems = ProviderExecutions.executionHistory.map(item => item.quickPickItem)
+    let quickPickItems = ExecutionsProvider.executionHistory.map(item => item.quickPickItem)
     let quickPickOptions = <vscode.QuickPickOptions>{
       canPickMany: false,
       ignoreFocusOut: false,
@@ -71,7 +71,7 @@ class ProviderExecutions {
     let quickPickExecution = await vscode.window.showQuickPick(quickPickItems, quickPickOptions)
     if (quickPickExecution !== undefined) {
       try {
-        let execution = ProviderExecutions.executionHistory.filter((item) => item.quickPickItem.label == quickPickExecution.label)
+        let execution = ExecutionsProvider.executionHistory.filter((item) => item.quickPickItem.label == quickPickExecution.label)
         runKarateTest([execution[0].executionArgs])
       } catch (e) {
         // do nothing
@@ -80,4 +80,4 @@ class ProviderExecutions {
   }
 }
 
-export default ProviderExecutions
+export default ExecutionsProvider

@@ -1,8 +1,8 @@
 import * as fs from 'fs'
 import * as vscode from 'vscode'
 
-import { getProjectDetail, IProjectDetail, ITestExecutionDetail } from './helper'
-import { ENTRY_STATE } from './types/entry'
+import { getProjectDetail, IProjectDetail, ITestExecutionDetail } from '../helper'
+import { ENTRY_STATE } from '../types/entry'
 
 interface IDisposable {
   dispose(): void
@@ -27,7 +27,7 @@ interface IAggregateResult {
   state: ENTRY_STATE
 }
 
-export class ProviderResults implements IDisposable {
+export class ResultsProvider implements IDisposable {
 
   public static results: IResult[] = []
   private static summaryResultsWatcher: vscode.FileSystemWatcher
@@ -36,15 +36,15 @@ export class ProviderResults implements IDisposable {
   private static _onTestResults: vscode.EventEmitter<any>
 
   constructor() {
-    ProviderResults.summaryResultsWatcher = vscode.workspace.createFileSystemWatcher("**/{results,karate-reports/karate-summary}-json.txt")
-    ProviderResults.summaryResultsWatcher.onDidCreate((e) => { ProviderResults.publishSummaryResults(e) })
-    ProviderResults.summaryResultsWatcher.onDidChange((e) => { ProviderResults.publishSummaryResults(e) })
-    ProviderResults._onSummaryResults = new vscode.EventEmitter<any>()
+    ResultsProvider.summaryResultsWatcher = vscode.workspace.createFileSystemWatcher("**/{results,karate-reports/karate-summary}-json.txt")
+    ResultsProvider.summaryResultsWatcher.onDidCreate((e) => { ResultsProvider.publishSummaryResults(e) })
+    ResultsProvider.summaryResultsWatcher.onDidChange((e) => { ResultsProvider.publishSummaryResults(e) })
+    ResultsProvider._onSummaryResults = new vscode.EventEmitter<any>()
 
-    ProviderResults.testResultsWatcher = vscode.workspace.createFileSystemWatcher("**/karate-reports/*.karate-json.txt")
-    ProviderResults.testResultsWatcher.onDidCreate((e) => { ProviderResults.publishTestResults(e) })
-    ProviderResults.testResultsWatcher.onDidChange((e) => { ProviderResults.publishTestResults(e) })
-    ProviderResults._onTestResults = new vscode.EventEmitter<any>()
+    ResultsProvider.testResultsWatcher = vscode.workspace.createFileSystemWatcher("**/karate-reports/*.karate-json.txt")
+    ResultsProvider.testResultsWatcher.onDidCreate((e) => { ResultsProvider.publishTestResults(e) })
+    ResultsProvider.testResultsWatcher.onDidChange((e) => { ResultsProvider.publishTestResults(e) })
+    ResultsProvider._onTestResults = new vscode.EventEmitter<any>()
   }
 
   private static publishSummaryResults(e: vscode.Uri) {
@@ -63,7 +63,7 @@ export class ProviderResults implements IDisposable {
     let second: string = lastModified.getSeconds().toString().padStart(2, '0')
     let milli: string = lastModified.getMilliseconds().toString().padEnd(3, '0')
     json.lastModified = `${month}/${day}/${year} ${hour}:${minute}:${second}.${milli}`
-    ProviderResults._onSummaryResults.fire(json)
+    ResultsProvider._onSummaryResults.fire(json)
   }
 
   private static publishTestResults(e: vscode.Uri) {
@@ -86,15 +86,15 @@ export class ProviderResults implements IDisposable {
     for (let ndx = 0; ndx < json.scenarioResults.length; ndx++) {
       if (lastIndex !== -1 && lastSectionIndex === json.scenarioResults[ndx].sectionIndex) {
         if (json.scenarioResults[ndx].failed) {
-          ProviderResults.results[lastIndex].state = ENTRY_STATE.FAIL
+          ResultsProvider.results[lastIndex].state = ENTRY_STATE.FAIL
         }
         switch (json.scenarioResults[ndx].failed) {
           case false:
-            ProviderResults.results[lastIndex].passes += 1
+            ResultsProvider.results[lastIndex].passes += 1
             break
           case true:
-            ProviderResults.results[lastIndex].fails += 1
-            ProviderResults.results[lastIndex].error.push("Line " + json.scenarioResults[ndx].line + ": " + json.scenarioResults[ndx].error)
+            ResultsProvider.results[lastIndex].fails += 1
+            ResultsProvider.results[lastIndex].error.push("Line " + json.scenarioResults[ndx].line + ": " + json.scenarioResults[ndx].error)
             break
         }
       } else {
@@ -127,12 +127,12 @@ export class ProviderResults implements IDisposable {
             result.state = ENTRY_STATE.FAIL
             break
         }
-        let targetIndex = ProviderResults.results.findIndex(r => r.name === result.name && r.path === result.path)
+        let targetIndex = ResultsProvider.results.findIndex(r => r.name === result.name && r.path === result.path)
         if (targetIndex === -1) {
-          ProviderResults.results.push(result)
-          targetIndex = ProviderResults.results.length - 1
+          ResultsProvider.results.push(result)
+          targetIndex = ResultsProvider.results.length - 1
         } else {
-          ProviderResults.results[targetIndex] = result
+          ResultsProvider.results[targetIndex] = result
         }
         if (result.isOutline) {
           lastIndex = targetIndex
@@ -156,7 +156,7 @@ export class ProviderResults implements IDisposable {
       error: [],
       state: ENTRY_STATE.NONE
     }
-    let results = ProviderResults.results.filter(r => r.path === result.path && !r.isFeature)
+    let results = ResultsProvider.results.filter(r => r.path === result.path && !r.isFeature)
     result.passes = results.reduce((n, { passes }) => n + passes, 0)
     result.fails = results.reduce((n, { fails }) => n + fails, 0)
     results.forEach((res) => res.error.forEach((e) => result.error.push(e)))
@@ -165,17 +165,17 @@ export class ProviderResults implements IDisposable {
     } else {
       result.state = ENTRY_STATE.PASS
     }
-    let findIndex = ProviderResults.results.findIndex(r => r.line === result.line && r.path === result.path)
+    let findIndex = ResultsProvider.results.findIndex(r => r.line === result.line && r.path === result.path)
     if (findIndex === -1) {
-      ProviderResults.results.push(result)
+      ResultsProvider.results.push(result)
     } else {
-      ProviderResults.results[findIndex] = result
+      ResultsProvider.results[findIndex] = result
     }
-    ProviderResults._onTestResults.fire(json)
+    ResultsProvider._onTestResults.fire(json)
   }
 
   public static clearTestResults() {
-    ProviderResults.results = []
+    ResultsProvider.results = []
   }
 
   public static getFolderResult(uri: vscode.Uri): IAggregateResult {
@@ -184,11 +184,11 @@ export class ProviderResults implements IDisposable {
       fails: 0,
       state: ENTRY_STATE.NONE
     }
-    if (ProviderResults.results.length > 0) {
+    if (ResultsProvider.results.length > 0) {
       let workspaceFolder = vscode.workspace.workspaceFolders.filter(folder => folder.uri.scheme === 'file')[0]
       let workspacePath = workspaceFolder.uri.path + '/'
       let folderPath = uri.path.split(workspacePath)[1]
-      let results = ProviderResults.results.filter(r => r.path.startsWith(folderPath) && r.isFeature)
+      let results = ResultsProvider.results.filter(r => r.path.startsWith(folderPath) && r.isFeature)
       if (results.length > 0) {
         folderResult.passes = results.reduce((n, { passes }) => n + passes, 0)
         folderResult.fails = results.reduce((n, { fails }) => n + fails, 0)
@@ -208,7 +208,7 @@ export class ProviderResults implements IDisposable {
       fails: 0,
       state: ENTRY_STATE.NONE
     }
-    let results = ProviderResults.results.filter(r => uri.path.endsWith(r.path) && r.isFeature)
+    let results = ResultsProvider.results.filter(r => uri.path.endsWith(r.path) && r.isFeature)
     if (results.length > 0) {
       fileResult.passes = results.reduce((n, { passes }) => n + passes, 0)
       fileResult.fails = results.reduce((n, { fails }) => n + fails, 0)
@@ -227,7 +227,7 @@ export class ProviderResults implements IDisposable {
       fails: 0,
       state: ENTRY_STATE.NONE
     }
-    let results = ProviderResults.results.filter(r => uri.path.endsWith(r.path) && !r.isFeature && r.tags.includes(tag.replace(/^@/, '')))
+    let results = ResultsProvider.results.filter(r => uri.path.endsWith(r.path) && !r.isFeature && r.tags.includes(tag.replace(/^@/, '')))
     if (results.length > 0) {
       fileTagResult.passes = results.reduce((n, { passes }) => n + passes, 0)
       fileTagResult.fails = results.reduce((n, { fails }) => n + fails, 0)
@@ -246,7 +246,7 @@ export class ProviderResults implements IDisposable {
       fails: 0,
       state: ENTRY_STATE.NONE
     }
-    let results = ProviderResults.results.filter(r => !r.isFeature && r.tags.includes(tag.replace(/^@/, '')))
+    let results = ResultsProvider.results.filter(r => !r.isFeature && r.tags.includes(tag.replace(/^@/, '')))
     if (results.length > 0) {
       tagResult.passes = results.reduce((n, { passes }) => n + passes, 0)
       tagResult.fails = results.reduce((n, { fails }) => n + fails, 0)
@@ -264,12 +264,12 @@ export class ProviderResults implements IDisposable {
     let state = ENTRY_STATE.NONE
     if (ted.testTitle.startsWith("Feature:")) {
       path = path + ":0"
-      let filteredResults = ProviderResults.results.filter(e => path.endsWith(e.path + ":" + e.line))
+      let filteredResults = ResultsProvider.results.filter(e => path.endsWith(e.path + ":" + e.line))
       if (filteredResults.length === 1) {
         state = filteredResults[0].state
       }
     } else {
-      let filteredResults = ProviderResults.results.filter(e => path.endsWith(e.path) && ted.testTitle.endsWith(e.name))
+      let filteredResults = ResultsProvider.results.filter(e => path.endsWith(e.path) && ted.testTitle.endsWith(e.name))
       if (filteredResults.length === 1) {
         state = filteredResults[0].state
       }
@@ -282,12 +282,12 @@ export class ProviderResults implements IDisposable {
     let result: IResult = null
     if (ted.testTitle.startsWith("Feature:")) {
       path = path + ":0"
-      let filteredResults = ProviderResults.results.filter(e => path.endsWith(e.path + ":" + e.line))
+      let filteredResults = ResultsProvider.results.filter(e => path.endsWith(e.path + ":" + e.line))
       if (filteredResults.length === 1) {
         result = filteredResults[0]
       }
     } else {
-      let filteredResults = ProviderResults.results.filter(e => path.endsWith(e.path) && ted.testTitle.endsWith(e.name))
+      let filteredResults = ResultsProvider.results.filter(e => path.endsWith(e.path) && ted.testTitle.endsWith(e.name))
       if (filteredResults.length === 1) {
         result = filteredResults[0]
       }
@@ -297,7 +297,7 @@ export class ProviderResults implements IDisposable {
 
   public static getFullSummary(ted: ITestExecutionDetail): vscode.MarkdownString[] {
     let summary: vscode.MarkdownString[] = []
-    let results = ProviderResults.getResult(ted)
+    let results = ResultsProvider.getResult(ted)
     if (results) {
       let summaryHeader = new vscode.MarkdownString()
       let summaryFooter = new vscode.MarkdownString(undefined, true)
@@ -320,7 +320,7 @@ export class ProviderResults implements IDisposable {
 
   public static getPartialSummary(ted: ITestExecutionDetail): vscode.MarkdownString {
     let summary = new vscode.MarkdownString(undefined, true)
-    let results = ProviderResults.getResult(ted)
+    let results = ResultsProvider.getResult(ted)
     if (results) {
       summary.appendCodeblock(ted.testTitle, 'karate')
       if (results.error) {
@@ -343,18 +343,18 @@ export class ProviderResults implements IDisposable {
   }
 
   public static get onSummaryResults(): vscode.Event<any> {
-    return ProviderResults._onSummaryResults.event
+    return ResultsProvider._onSummaryResults.event
   }
 
   public static get onTestResults(): vscode.Event<any> {
-    return ProviderResults._onTestResults.event
+    return ResultsProvider._onTestResults.event
   }
 
   public dispose(): void {
-    ProviderResults._onSummaryResults.dispose()
-    ProviderResults.summaryResultsWatcher.dispose()
-    ProviderResults._onTestResults.dispose()
-    ProviderResults.testResultsWatcher.dispose()
+    ResultsProvider._onSummaryResults.dispose()
+    ResultsProvider.summaryResultsWatcher.dispose()
+    ResultsProvider._onTestResults.dispose()
+    ResultsProvider.testResultsWatcher.dispose()
   }
 
 }

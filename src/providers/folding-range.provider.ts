@@ -1,9 +1,9 @@
 import * as vscode from 'vscode'
 
-import { getTestExecutionDetail, ITestExecutionDetail } from './helper'
-import { ENTRY_TYPE } from './types/entry'
+import { getTestExecutionDetail, ITestExecutionDetail } from '../helper'
+import { ENTRY_TYPE } from '../types/entry'
 
-class ProviderFoldingRange implements vscode.FoldingRangeProvider {
+class FoldingRangeProvider implements vscode.FoldingRangeProvider {
 
   async provideFoldingRanges(document: vscode.TextDocument, context: vscode.FoldingContext, token: vscode.CancellationToken): Promise<vscode.FoldingRange[]> {
     let tedArray: ITestExecutionDetail[] = await getTestExecutionDetail(document.uri, ENTRY_TYPE.FILE)
@@ -38,4 +38,4 @@ class ProviderFoldingRange implements vscode.FoldingRangeProvider {
   }
 }
 
-export default ProviderFoldingRange
+export default FoldingRangeProvider

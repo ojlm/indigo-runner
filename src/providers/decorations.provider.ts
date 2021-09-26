@@ -1,10 +1,10 @@
 import * as vscode from 'vscode'
 
-import { getDarkIcon, getLightIcon, getTestExecutionDetail, ITestExecutionDetail } from './helper'
-import { ProviderResults } from './providerResults'
-import { ENTRY_STATE, ENTRY_TYPE } from './types/entry'
+import { getDarkIcon, getLightIcon, getTestExecutionDetail, ITestExecutionDetail } from '../helper'
+import { ENTRY_STATE, ENTRY_TYPE } from '../types/entry'
+import { ResultsProvider } from './results.provider'
 
-class ProviderDecorations {
+class DecorationsProvider {
 
   private timeout: NodeJS.Timeout
   private context: vscode.ExtensionContext
@@ -30,7 +30,7 @@ class ProviderDecorations {
       this.triggerUpdateDecorations()
     }, null, this.context.subscriptions)
 
-    ProviderResults.onTestResults((json) => {
+    ResultsProvider.onTestResults((json) => {
       this.triggerUpdateDecorations()
     })
 
@@ -48,13 +48,13 @@ class ProviderDecorations {
       if (Boolean(vscode.workspace.getConfiguration('IndigoRunner.editor').get('toggleResultsInGutter'))) {
         let tedArray: ITestExecutionDetail[] = await getTestExecutionDetail(editor.document.uri, ENTRY_TYPE.FILE)
         tedArray.forEach((ted) => {
-          let state = ProviderResults.getTestResult(ted)
+          let state = ResultsProvider.getTestResult(ted)
           let range = ted.testRange
           let positionEnd: vscode.Position = new vscode.Position(range.start.line, range.start.character + 2)
           let rangeNew = new vscode.Range(range.start, positionEnd)
           let markdownResults: vscode.MarkdownString[] = []
           if (state === ENTRY_STATE.FAIL) {
-            markdownResults = ProviderResults.getFullSummary(ted)
+            markdownResults = ResultsProvider.getFullSummary(ted)
           }
           let decorationOptions: vscode.DecorationOptions = {
             hoverMessage: markdownResults,
@@ -114,4 +114,4 @@ class ProviderDecorations {
   }
 }
 
-export default ProviderDecorations
+export default DecorationsProvider

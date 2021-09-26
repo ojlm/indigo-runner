@@ -1,17 +1,17 @@
 import * as path from 'path'
 import * as vscode from 'vscode'
 
-import { getIcon } from './helper'
-import ProviderFileSystem from './providerFileSystem'
-import { ProviderResults } from './providerResults'
-import { DISPLAY_TYPE } from './types/display'
-import { ENTRY_STATE, ENTRY_TYPE, IEntry } from './types/entry'
+import { getIcon } from '../helper'
+import { DISPLAY_TYPE } from '../types/display'
+import { ENTRY_STATE, ENTRY_TYPE, IEntry } from '../types/entry'
+import ProviderFileSystem from './file-system.provider'
+import { ResultsProvider } from './results.provider'
 
 interface IDisposable {
   dispose(): void
 }
 
-class ProviderReports implements vscode.TreeDataProvider<IEntry>, IDisposable {
+class ReportsProvider implements vscode.TreeDataProvider<IEntry>, IDisposable {
 
   private treeView: vscode.TreeView<any>
   private providerFileSystem: ProviderFileSystem
@@ -26,26 +26,26 @@ class ProviderReports implements vscode.TreeDataProvider<IEntry>, IDisposable {
   constructor() {
     this.providerFileSystem = new ProviderFileSystem()
     this.treeView = vscode.window.createTreeView('indigo-reports', { showCollapseAll: true, treeDataProvider: this })
-    ProviderReports._onRefreshStart = new vscode.EventEmitter<any>()
-    ProviderReports._onRefreshEnd = new vscode.EventEmitter<any>()
-    ProviderResults.onTestResults(() => { this.refresh() })
+    ReportsProvider._onRefreshStart = new vscode.EventEmitter<any>()
+    ReportsProvider._onRefreshEnd = new vscode.EventEmitter<any>()
+    ResultsProvider.onTestResults(() => { this.refresh() })
   }
 
   public static get onRefreshStart(): vscode.Event<any> {
-    return ProviderReports._onRefreshStart.event
+    return ReportsProvider._onRefreshStart.event
   }
 
   public static get onRefreshEnd(): vscode.Event<any> {
-    return ProviderReports._onRefreshEnd.event
+    return ReportsProvider._onRefreshEnd.event
   }
 
   public async refresh() {
-    ProviderReports._onRefreshStart.fire(null)
+    ReportsProvider._onRefreshStart.fire(null)
     this.reportGlob = String(vscode.workspace.getConfiguration('IndigoRunner.reports').get('toTargetByGlob'))
     this.reportFiles = await vscode.workspace.findFiles(this.reportGlob).then((value) => { return value })
     this.displayType = String(vscode.workspace.getConfiguration('IndigoRunner.reports').get('activityBarDisplayType'))
     this._onDidChangeTreeData.fire()
-    ProviderReports._onRefreshEnd.fire(null)
+    ReportsProvider._onRefreshEnd.fire(null)
   }
 
   async getChildren(element?: IEntry): Promise<IEntry[]> {
@@ -122,4 +122,4 @@ class ProviderReports implements vscode.TreeDataProvider<IEntry>, IDisposable {
 
 }
 
-export default ProviderReports
+export default ReportsProvider

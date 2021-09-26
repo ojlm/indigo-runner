@@ -3,8 +3,8 @@ import path = require('path')
 import * as vscode from 'vscode'
 
 import { openExternalUrl } from './commands'
-import { ServiceLocalStorage } from './serviceLocalStorage'
 import { ENTRY_TYPE } from './types/entry'
+import { LocalStorage } from './utils/local-storage'
 
 interface IProjectDetail {
   projectRoot: string
@@ -282,11 +282,11 @@ function createTreeViewWatcher(watcher, watcherGlob, provider) {
 function showWhatsNew(context: vscode.ExtensionContext) {
   const VERSION_KEY = 'karate.runner.version'
   const EXTENSION_ID = 'kirkslota.karate-runner'
-  ServiceLocalStorage.initialize(context.globalState)
+  LocalStorage.initialize(context.globalState)
   let extVersionCurrent = vscode.extensions.getExtension(EXTENSION_ID).packageJSON.version
-  let extVersionLastRecord = ServiceLocalStorage.instance.getValue(VERSION_KEY)
+  let extVersionLastRecord = LocalStorage.instance.getValue(VERSION_KEY)
   if (extVersionLastRecord == null || extVersionLastRecord != extVersionCurrent) {
-    ServiceLocalStorage.instance.setValue(VERSION_KEY, extVersionCurrent)
+    LocalStorage.instance.setValue(VERSION_KEY, extVersionCurrent)
     openExternalUrl(`https://github.com/kirksl/karate-runner/releases/tag/v${extVersionCurrent}`)
   }
 }

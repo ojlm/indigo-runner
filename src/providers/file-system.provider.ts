@@ -139,7 +139,7 @@ export class FileStat implements vscode.FileStat {
 
 }
 
-export class ProviderFileSystem implements vscode.FileSystemProvider {
+export class FileSystemProvider implements vscode.FileSystemProvider {
 
   private _onDidChangeFile: vscode.EventEmitter<vscode.FileChangeEvent[]>
 
@@ -241,4 +241,4 @@ export class ProviderFileSystem implements vscode.FileSystemProvider {
   }
 }
 
-export default ProviderFileSystem
+export default FileSystemProvider

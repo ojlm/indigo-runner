@@ -18,18 +18,18 @@ import {
   toggleResultsInGutter,
 } from './commands'
 import { createTreeViewWatcher } from './helper'
-import ProviderCodeLens from './providerCodeLens'
-import ProviderCompletionItem from './providerCompletionItem'
-import ProviderDebugAdapter from './providerDebugAdapter'
-import ProviderDebugConfiguration from './providerDebugConfiguration'
-import ProviderDecorations from './providerDecorations'
-import ProviderDefinition from './providerDefinition'
-import ProviderExecutions from './providerExecutions'
-import ProviderHoverRunDebug from './providerHoverRunDebug'
-import ProviderKarateTests from './providerKarateTests'
-import ProviderReports from './providerReports'
-import { ProviderResults } from './providerResults'
-import ProviderStatusBar from './providerStatusBar'
+import CodeLensProvider from './providers/code-lens.provider'
+import CompletionItemProvider from './providers/completion-item.provider'
+import DebugAdapterProvider from './providers/debug-adapter.provider'
+import DebugConfigurationProvider from './providers/debug-configuration.provider'
+import DecorationsProvider from './providers/decorations.provider'
+import DefinitionProvider from './providers/definition.provider'
+import ExecutionsProvider from './providers/executions.provider'
+import HoverRunDebugProvider from './providers/hover-run-debug.provider'
+import KarateTestsProvider from './providers/karate-tests.provider'
+import ReportsProvider from './providers/reports.provider'
+import { ResultsProvider } from './providers/results.provider'
+import StatusBarProvider from './providers/status-bar.provider'
 import { RemoteProviders } from './remote/remote-providers'
 
 //import ProviderFoldingRange from "./providerFoldingRange"
@@ -40,18 +40,18 @@ let karateTestsWatcher = null
 export function activate(context: vscode.ExtensionContext) {
   new RemoteProviders(context)
   //showWhatsNew(context)
-  let resultsProvider = new ProviderResults()
-  let reportsProvider = new ProviderReports()
-  let karateTestsProvider = new ProviderKarateTests()
-  let debugAdapterProvider = new ProviderDebugAdapter()
-  let debugConfigurationProvider = new ProviderDebugConfiguration()
-  let executionsProvider = new ProviderExecutions()
-  let statusBarProvider = new ProviderStatusBar(context)
-  let codeLensProvider = new ProviderCodeLens()
-  let definitionProvider = new ProviderDefinition()
-  let hoverRunDebugProvider = new ProviderHoverRunDebug(context)
-  let completionItemProvider = new ProviderCompletionItem()
-  let decorationsProvider = new ProviderDecorations(context)
+  let resultsProvider = new ResultsProvider()
+  let reportsProvider = new ReportsProvider()
+  let karateTestsProvider = new KarateTestsProvider()
+  let debugAdapterProvider = new DebugAdapterProvider()
+  let debugConfigurationProvider = new DebugConfigurationProvider()
+  let executionsProvider = new ExecutionsProvider()
+  let statusBarProvider = new StatusBarProvider(context)
+  let codeLensProvider = new CodeLensProvider()
+  let definitionProvider = new DefinitionProvider()
+  let hoverRunDebugProvider = new HoverRunDebugProvider(context)
+  let completionItemProvider = new CompletionItemProvider()
+  let decorationsProvider = new DecorationsProvider(context)
   //let foldingRangeProvider = new ProviderFoldingRange()
 
   let karateFile = { language: "karate", scheme: "file" }
@@ -77,7 +77,7 @@ export function activate(context: vscode.ExtensionContext) {
   let clearResultsCommand = vscode.commands.registerCommand("IndigoRunner.tests.clearResults", () => {
     karateTestsProvider.clearResults()
     decorationsProvider.triggerUpdateDecorations()
-    ProviderStatusBar.reset()
+    StatusBarProvider.reset()
   })
   let openSettingsCommand = vscode.commands.registerCommand("IndigoRunner.tests.openSettings", openKarateSettings)
   let toggleResultsInGutterCommand = vscode.commands.registerCommand("IndigoRunner.editor.toggleResultsInGutter", toggleResultsInGutter)
@@ -86,7 +86,7 @@ export function activate(context: vscode.ExtensionContext) {
   let registerDebugConfigurationProvider = vscode.debug.registerDebugConfigurationProvider('karate', debugConfigurationProvider)
   let registerCodeLensProvider = vscode.languages.registerCodeLensProvider(karateFile, codeLensProvider)
   let registerDefinitionProvider = vscode.languages.registerDefinitionProvider(karateFile, definitionProvider)
-  let registerProviderHoverRunDebug = vscode.languages.registerHoverProvider(karateFile, hoverRunDebugProvider)
+  let registerHoverRunDebugProvider = vscode.languages.registerHoverProvider(karateFile, hoverRunDebugProvider)
   let registerCompletionItemProvider = vscode.languages.registerCompletionItemProvider(karateFile, completionItemProvider, ...['\'', '\"'])
   //let registerFoldingRangeProvider = vscode.languages.registerFoldingRangeProvider(karateFile, foldingRangeProvider)
 
@@ -174,7 +174,7 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(registerCodeLensProvider)
   context.subscriptions.push(registerDefinitionProvider)
   context.subscriptions.push(resultsProvider)
-  context.subscriptions.push(registerProviderHoverRunDebug)
+  context.subscriptions.push(registerHoverRunDebugProvider)
   context.subscriptions.push(registerCompletionItemProvider)
   //context.subscriptions.push(registerFoldingRangeProvider)
 }

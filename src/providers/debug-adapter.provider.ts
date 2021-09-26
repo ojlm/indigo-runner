@@ -1,9 +1,9 @@
 import fs = require('fs')
 import * as vscode from 'vscode'
 
-import { getProjectDetail, IProjectDetail } from './helper'
+import { getProjectDetail, IProjectDetail } from '../helper'
 
-class ProviderDebugAdapter implements vscode.DebugAdapterDescriptorFactory {
+class DebugAdapterProvider implements vscode.DebugAdapterDescriptorFactory {
   createDebugAdapterDescriptor(session: vscode.DebugSession, executable: vscode.DebugAdapterExecutable | undefined): vscode.ProviderResult<vscode.DebugAdapterDescriptor> {
     let projectRootPath = ""
     let settingsTimeout = Number(vscode.workspace.getConfiguration('IndigoRunner.debugger').get('serverPortTimeout'))
@@ -87,4 +87,4 @@ class ProviderDebugAdapter implements vscode.DebugAdapterDescriptorFactory {
   }
 }
 
-export default ProviderDebugAdapter
+export default DebugAdapterProvider

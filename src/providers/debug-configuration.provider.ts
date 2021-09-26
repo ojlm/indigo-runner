@@ -9,7 +9,7 @@ const DEFAULT_CONFIG = {
   "karateCli": "${config:IndigoRunner.karateJar.commandLineArgs} -d"
 }
 
-class ProviderDebugConfiguration implements vscode.DebugConfigurationProvider {
+class DebugConfigurationProvider implements vscode.DebugConfigurationProvider {
   provideDebugConfigurations(folder: vscode.WorkspaceFolder | undefined, token?: vscode.CancellationToken): vscode.ProviderResult<vscode.DebugConfiguration[]> {
     // auto-fill new launch.json with default config
     return Promise.resolve([DEFAULT_CONFIG])
@@ -24,4 +24,4 @@ class ProviderDebugConfiguration implements vscode.DebugConfigurationProvider {
   }
 }
 
-export default ProviderDebugConfiguration
+export default DebugConfigurationProvider

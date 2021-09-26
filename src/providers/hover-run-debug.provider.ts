@@ -1,8 +1,8 @@
 import * as vscode from 'vscode'
 
-import { ENTRY_TYPE } from './types/entry'
+import { ENTRY_TYPE } from '../types/entry'
 
-class ProviderHoverRunDebug implements vscode.HoverProvider {
+class HoverRunDebugProvider implements vscode.HoverProvider {
 
   private extensionContext: vscode.ExtensionContext
 
@@ -42,4 +42,4 @@ class ProviderHoverRunDebug implements vscode.HoverProvider {
   }
 }
 
-export default ProviderHoverRunDebug
+export default HoverRunDebugProvider

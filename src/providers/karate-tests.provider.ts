@@ -7,20 +7,20 @@ import {
   getTestExecutionDetailTags,
   ITestExecutionDetail,
   oneElementsExist,
-} from './helper'
-import ProviderFileSystem from './providerFileSystem'
-import { ProviderResults } from './providerResults'
-import { DISPLAY_TYPE } from './types/display'
-import { ENTRY_STATE, ENTRY_TYPE, IEntry } from './types/entry'
+} from '../helper'
+import { DISPLAY_TYPE } from '../types/display'
+import { ENTRY_STATE, ENTRY_TYPE, IEntry } from '../types/entry'
+import FileSystemProvider from './file-system.provider'
+import { ResultsProvider } from './results.provider'
 
 interface IDisposable {
   dispose(): void
 }
 
-class ProviderKarateTests implements vscode.TreeDataProvider<IEntry>, IDisposable {
+class KarateTestsProvider implements vscode.TreeDataProvider<IEntry>, IDisposable {
 
   private treeView: vscode.TreeView<any>
-  private providerFileSystem: ProviderFileSystem
+  private FileSystemProvider: FileSystemProvider
   private testGlob: string
   private testFiles: vscode.Uri[]
   private filterTags: string[]
@@ -32,34 +32,34 @@ class ProviderKarateTests implements vscode.TreeDataProvider<IEntry>, IDisposabl
   private static _onRefreshEnd: vscode.EventEmitter<any>
 
   constructor() {
-    this.providerFileSystem = new ProviderFileSystem()
+    this.FileSystemProvider = new FileSystemProvider()
     this.treeView = vscode.window.createTreeView('indigo-tests', { showCollapseAll: true, treeDataProvider: this })
-    ProviderKarateTests._onRefreshStart = new vscode.EventEmitter<any>()
-    ProviderKarateTests._onRefreshEnd = new vscode.EventEmitter<any>()
-    ProviderResults.onTestResults(() => this.refresh())
+    KarateTestsProvider._onRefreshStart = new vscode.EventEmitter<any>()
+    KarateTestsProvider._onRefreshEnd = new vscode.EventEmitter<any>()
+    ResultsProvider.onTestResults(() => this.refresh())
   }
 
   public static get onRefreshStart(): vscode.Event<any> {
-    return ProviderKarateTests._onRefreshStart.event
+    return KarateTestsProvider._onRefreshStart.event
   }
 
   public static get onRefreshEnd(): vscode.Event<any> {
-    return ProviderKarateTests._onRefreshEnd.event
+    return KarateTestsProvider._onRefreshEnd.event
   }
 
   public async refresh() {
-    ProviderKarateTests._onRefreshStart.fire(null)
+    KarateTestsProvider._onRefreshStart.fire(null)
     this.testGlob = String(vscode.workspace.getConfiguration('IndigoRunner.tests').get('toTargetByGlob'))
     this.testFiles = await vscode.workspace.findFiles(this.testGlob).then((value) => { return value })
     this.filterTags = (String(vscode.workspace.getConfiguration('IndigoRunner.tests').get('toTargetByTag'))).split(",")
     this.hideIgnored = Boolean(vscode.workspace.getConfiguration('IndigoRunner.tests').get('hideIgnored'))
     this.displayType = String(vscode.workspace.getConfiguration('IndigoRunner.tests').get('activityBarDisplayType'))
     this._onDidChangeTreeData.fire()
-    ProviderKarateTests._onRefreshEnd.fire(null)
+    KarateTestsProvider._onRefreshEnd.fire(null)
   }
 
   public clearResults() {
-    ProviderResults.clearTestResults()
+    ResultsProvider.clearTestResults()
     this.refresh()
   }
 
@@ -205,7 +205,7 @@ class ProviderKarateTests implements vscode.TreeDataProvider<IEntry>, IDisposabl
     }
     let entries: IEntry[] = []
     for (let ndx = 0; ndx < tags.length; ndx++) {
-      let tagResult = ProviderResults.getTagResult(tags[ndx])
+      let tagResult = ResultsProvider.getTagResult(tags[ndx])
       let tagCommand: vscode.Command = {
         arguments: [],
         command: "IndigoRunner.tests.open",
@@ -241,7 +241,7 @@ class ProviderKarateTests implements vscode.TreeDataProvider<IEntry>, IDisposabl
         command: "IndigoRunner.tests.open",
         title: ted.codelensRunTitle
       }
-      let tooltip = ProviderResults.getPartialSummary(ted)
+      let tooltip = ResultsProvider.getPartialSummary(ted)
       if (file.tag) {
         if (tags.includes(file.tag)) {
           entries.push({
@@ -249,7 +249,7 @@ class ProviderKarateTests implements vscode.TreeDataProvider<IEntry>, IDisposabl
             type: ENTRY_TYPE.TEST,
             tooltip: tooltip,
             command: testCommand,
-            state: ProviderResults.getTestResult(ted),
+            state: ResultsProvider.getTestResult(ted),
             ignored: ted.testIgnored
           })
         }
@@ -259,7 +259,7 @@ class ProviderKarateTests implements vscode.TreeDataProvider<IEntry>, IDisposabl
           type: ENTRY_TYPE.TEST,
           tooltip: tooltip,
           command: testCommand,
-          state: ProviderResults.getTestResult(ted),
+          state: ResultsProvider.getTestResult(ted),
           ignored: ted.testIgnored
         })
       }
@@ -268,7 +268,7 @@ class ProviderKarateTests implements vscode.TreeDataProvider<IEntry>, IDisposabl
   }
 
   private async getFilesFolders(directory: IEntry): Promise<IEntry[]> {
-    let children = await this.providerFileSystem.readDirectory(directory.uri)
+    let children = await this.FileSystemProvider.readDirectory(directory.uri)
     let childrenFiltered = children.filter(child => {
       let childUri = vscode.Uri.file(path.join(directory.uri.fsPath, child[0]))
       let found = this.testFiles.find(file => {
@@ -299,7 +299,7 @@ class ProviderKarateTests implements vscode.TreeDataProvider<IEntry>, IDisposabl
         }
       }
       let cmd = (entryType == ENTRY_TYPE.FILE) ? "IndigoRunner.tests.open" : "IndigoRunner.tests.runAll"
-      let result = (entryType == ENTRY_TYPE.FILE) ? ProviderResults.getFileResult(uri) : ProviderResults.getFolderResult(uri)
+      let result = (entryType == ENTRY_TYPE.FILE) ? ResultsProvider.getFileResult(uri) : ResultsProvider.getFolderResult(uri)
       entries.push({
         uri: uri,
         type: entryType,
@@ -334,7 +334,7 @@ class ProviderKarateTests implements vscode.TreeDataProvider<IEntry>, IDisposabl
       }
       if (directory.tag) {
         if (tags.includes(directory.tag)) {
-          let result = ProviderResults.getFileTagResult(testFilesFiltered[ndx], directory.tag)
+          let result = ResultsProvider.getFileTagResult(testFilesFiltered[ndx], directory.tag)
           entries.push({
             uri: testFilesFiltered[ndx],
             tag: directory.tag,
@@ -350,7 +350,7 @@ class ProviderKarateTests implements vscode.TreeDataProvider<IEntry>, IDisposabl
           })
         }
       } else {
-        let result = ProviderResults.getFileResult(testFilesFiltered[ndx])
+        let result = ResultsProvider.getFileResult(testFilesFiltered[ndx])
         entries.push({
           uri: testFilesFiltered[ndx],
           type: ENTRY_TYPE.FILE,
@@ -375,4 +375,4 @@ class ProviderKarateTests implements vscode.TreeDataProvider<IEntry>, IDisposabl
 
 }
 
-export default ProviderKarateTests
+export default KarateTestsProvider

@@ -13,10 +13,10 @@ import {
   IProjectDetail,
   ITestExecutionDetail,
 } from './helper'
-import ProviderExecutions from './providerExecutions'
-import ProviderKarateTests from './providerKarateTests'
-import ProviderReports from './providerReports'
-import ProviderStatusBar from './providerStatusBar'
+import ExecutionsProvider from './providers/executions.provider'
+import KarateTestsProvider from './providers/karate-tests.provider'
+import ReportsProvider from './providers/reports.provider'
+import StatusBarProvider from './providers/status-bar.provider'
 import { ENTRY_TYPE } from './types/entry'
 
 let debugLineNumber: number = 0
@@ -302,8 +302,8 @@ async function runKarateTest(args = null) {
     if (e.execution.task.name == 'Indigo Runner') {
       isTaskExecuting = false
       watcher.dispose()
-      ProviderExecutions.addExecutionToHistory()
-      ProviderExecutions.executionArgs = null
+      ExecutionsProvider.addExecutionToHistory()
+      ExecutionsProvider.executionArgs = null
       if (Boolean(vscode.workspace.getConfiguration('IndigoRunner.reports').get('openAfterEachRun'))) {
         reportUrisFound.forEach((reportUri) => {
           openExternalUri(reportUri)
@@ -312,8 +312,8 @@ async function runKarateTest(args = null) {
     }
     reportUrisFound = []
   })
-  ProviderStatusBar.reset()
-  ProviderExecutions.executionArgs = args
+  StatusBarProvider.reset()
+  ExecutionsProvider.executionArgs = args
   let showProgress = (task: vscode.TaskExecution) => {
     vscode.window.withProgress(
       {
@@ -386,7 +386,7 @@ async function filterReportsTree(context: vscode.ExtensionContext) {
               inputBox.busy = true
               inputBox.enabled = false
               await new Promise(resolve => {
-                ProviderReports.onRefreshEnd(() => {
+                ReportsProvider.onRefreshEnd(() => {
                   resolve(null)
                 })
 
@@ -451,7 +451,7 @@ async function filterTestsTree(context: vscode.ExtensionContext) {
               inputBox.busy = true
               inputBox.enabled = false
               await new Promise(resolve => {
-                ProviderKarateTests.onRefreshEnd(() => {
+                KarateTestsProvider.onRefreshEnd(() => {
                   resolve(null)
                 })
                 vscode.workspace.getConfiguration().update('IndigoRunner.tests.toTargetByGlob', inputBox.value)
@@ -506,7 +506,7 @@ async function filterTestsTree(context: vscode.ExtensionContext) {
               inputBox.busy = true
               inputBox.enabled = false
               await new Promise(resolve => {
-                ProviderKarateTests.onRefreshEnd(() => {
+                KarateTestsProvider.onRefreshEnd(() => {
                   resolve(null)
                 })
 

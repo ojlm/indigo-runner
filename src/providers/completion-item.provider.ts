@@ -2,9 +2,9 @@ import fs = require('fs')
 import path = require('path')
 import * as vscode from 'vscode'
 
-import { getProjectDetail, IProjectDetail } from './helper'
+import { getProjectDetail, IProjectDetail } from '../helper'
 
-class ProviderCompletionItem implements vscode.CompletionItemProvider {
+class CompletionItemProvider implements vscode.CompletionItemProvider {
 
   provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList> {
     let linePrefix = document.lineAt(position).text.substr(0, position.character)
@@ -76,4 +76,4 @@ class ProviderCompletionItem implements vscode.CompletionItemProvider {
   }
 }
 
-export default ProviderCompletionItem
+export default CompletionItemProvider

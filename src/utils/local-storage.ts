@@ -1,14 +1,14 @@
 import { Memento } from 'vscode'
 
-export class ServiceLocalStorage {
+export class LocalStorage {
 
-  public static instance: ServiceLocalStorage
+  public static instance: LocalStorage
 
   private constructor(private storage: Memento) {
   }
 
   public static initialize(storage: Memento) {
-    this.instance = new ServiceLocalStorage(storage)
+    this.instance = new LocalStorage(storage)
   }
 
   public getValue<T>(key: string): T {

@@ -1,9 +1,9 @@
 import * as vscode from 'vscode'
 
-import { getTestExecutionDetail, ITestExecutionDetail } from './helper'
-import { ENTRY_TYPE } from './types/entry'
+import { getTestExecutionDetail, ITestExecutionDetail } from '../helper'
+import { ENTRY_TYPE } from '../types/entry'
 
-class ProviderCodeLens implements vscode.CodeLensProvider {
+class CodeLensProvider implements vscode.CodeLensProvider {
   async provideCodeLenses(document: vscode.TextDocument): Promise<vscode.CodeLens[]> {
     let codeLensArray = []
     let tedArray: ITestExecutionDetail[] = await getTestExecutionDetail(document.uri, ENTRY_TYPE.FILE)
@@ -29,4 +29,4 @@ class ProviderCodeLens implements vscode.CodeLensProvider {
   }
 }
 
-export default ProviderCodeLens
+export default CodeLensProvider
