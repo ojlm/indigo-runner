@@ -30,6 +30,7 @@
   "activationEvents": [
     "onLanguage:karate",
     "onLanguage:javascript",
+    "onView:indigo-remote",
     "onView:indigo-tests",
     "onView:indigo-reports"
   ],
@@ -53,22 +54,23 @@
       "indigo-runner": [
         {
           "id": "indigo-remote",
-          "name": "Remote"
+          "name": "Remote",
+          "when": "config.IndigoRunner.remote.enabled == true"
         },
         {
           "id": "indigo-tests",
           "name": "Tests",
-          "when": "workbenchState != empty"
+          "when": "workbenchState != empty && config.IndigoRunner.remote.enabled == false"
         },
         {
           "id": "indigo-reports",
           "name": "Reports",
-          "when": "workbenchState != empty"
+          "when": "workbenchState != empty && config.IndigoRunner.remote.enabled == false"
         },
         {
           "id": "indigo-welcome",
           "name": "Welcome",
-          "when": "workbenchState == empty"
+          "when": "workbenchState == empty && && config.IndigoRunner.remote.enabled == false"
         }
       ]
     },
@@ -79,6 +81,15 @@
       }
     ],
     "commands": [
+      {
+        "command": "IndigoRunner.openSettings",
+        "title": "Open Settings",
+        "icon": {
+          "light": "resources/light/gear.svg",
+          "dark": "resources/dark/gear.svg"
+        },
+        "category": "Indigo"
+      },
       {
         "command": "IndigoRunner.paste",
         "title": "Smart Paste",
@@ -92,6 +103,15 @@
       {
         "command": "IndigoRunner.getDebugBuildFile",
         "title": "Get Build File To Debug",
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.remote.refresh",
+        "title": "Refresh remote projects",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        },
         "category": "Indigo"
       },
       {
@@ -190,15 +210,6 @@
         "category": "Indigo"
       },
       {
-        "command": "IndigoRunner.tests.openSettings",
-        "title": "Open Settings",
-        "icon": {
-          "light": "resources/light/gear.svg",
-          "dark": "resources/dark/gear.svg"
-        },
-        "category": "Indigo"
-      },
-      {
         "command": "IndigoRunner.tests.open",
         "title": "Open In Editor",
         "icon": {
@@ -261,6 +272,16 @@
     "menus": {
       "view/title": [
         {
+          "command": "IndigoRunner.remote.refresh",
+          "when": "view == indigo-remote",
+          "group": "navigation@1"
+        },
+        {
+          "command": "IndigoRunner.openSettings",
+          "when": "view == indigo-remote",
+          "group": "navigation@2"
+        },
+        {
           "command": "IndigoRunner.reports.refreshTree",
           "when": "view == indigo-reports",
           "group": "navigation@1"
@@ -311,7 +332,7 @@
           "group": "navigation@4"
         },
         {
-          "command": "IndigoRunner.tests.openSettings",
+          "command": "IndigoRunner.openSettings",
           "when": "view == indigo-tests",
           "group": "navigation@5"
         }
@@ -382,7 +403,7 @@
           "group": "navigation@1"
         },
         {
-          "command": "IndigoRunner.tests.openSettings",
+          "command": "IndigoRunner.openSettings",
           "when": "resourceLangId == karate",
           "group": "navigation@2"
         },

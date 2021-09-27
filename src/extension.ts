@@ -1,23 +1,9 @@
 import * as vscode from 'vscode'
 
-import {
-  debugKarateTest,
-  displayReportsTree,
-  displayTestsTree,
-  filterReportsTree,
-  filterTestsTree,
-  getDebugBuildFile,
-  getDebugFile,
-  openExternalUri,
-  openFileInEditor,
-  openKarateSettings,
-  runAllKarateTests,
-  runKarateTest,
-  runTagKarateTests,
-  smartPaste,
-  toggleResultsInGutter,
-} from './commands'
+import * as commands from './commands'
+import { RunnerCommands } from './commaon/constants'
 import { createTreeViewWatcher } from './helper'
+import logger from './logger'
 import CodeLensProvider from './providers/code-lens.provider'
 import CompletionItemProvider from './providers/completion-item.provider'
 import DebugAdapterProvider from './providers/debug-adapter.provider'
@@ -30,6 +16,8 @@ import KarateTestsProvider from './providers/karate-tests.provider'
 import ReportsProvider from './providers/reports.provider'
 import { ResultsProvider } from './providers/results.provider'
 import StatusBarProvider from './providers/status-bar.provider'
+import { Project } from './remote/model/ide.model'
+import { RemoteProjectProvider } from './remote/providers/remote-project.provider'
 import { RemoteProviders } from './remote/remote-providers'
 
 //import ProviderFoldingRange from "./providerFoldingRange"
@@ -38,7 +26,11 @@ let reportsWatcher = null
 let karateTestsWatcher = null
 
 export function activate(context: vscode.ExtensionContext) {
-  new RemoteProviders(context)
+  const remoteProviders = new RemoteProviders(context)
+  const remoteProjectProvider = new RemoteProjectProvider(remoteProviders)
+  remoteProviders.http.onDidChangeClient(() => remoteProjectProvider.reresh())
+  logger.show()
+
   //showWhatsNew(context)
   let resultsProvider = new ResultsProvider()
   let reportsProvider = new ReportsProvider()
@@ -56,39 +48,47 @@ export function activate(context: vscode.ExtensionContext) {
 
   let karateFile = { language: "karate", scheme: "file" }
 
-  let smartPasteCommand = vscode.commands.registerCommand("IndigoRunner.paste", smartPaste)
-  let getDebugFileCommand = vscode.commands.registerCommand("IndigoRunner.getDebugFile", getDebugFile)
-  let getDebugBuildFileCommand = vscode.commands.registerCommand("IndigoRunner.getDebugBuildFile", getDebugBuildFile)
-  let debugTestCommand = vscode.commands.registerCommand("IndigoRunner.tests.debug", debugKarateTest)
-  let debugAllCommand = vscode.commands.registerCommand("IndigoRunner.tests.debugAll", debugKarateTest)
-  let runTestCommand = vscode.commands.registerCommand("IndigoRunner.tests.run", runKarateTest)
-  let runAllCommand = vscode.commands.registerCommand("IndigoRunner.tests.runAll", runAllKarateTests)
-  let runTagCommand = vscode.commands.registerCommand("IndigoRunner.tests.runTag", runTagKarateTests)
-  let displayListReportsTreeCommand = vscode.commands.registerCommand("IndigoRunner.reports.displayList", () => displayReportsTree("List"))
-  let displayTreeReportsTreeCommand = vscode.commands.registerCommand("IndigoRunner.reports.displayTree", () => displayReportsTree("Tree"))
-  let displayListTestsTreeCommand = vscode.commands.registerCommand("IndigoRunner.tests.displayList", () => displayTestsTree("List"))
-  let displayTreeTestsTreeCommand = vscode.commands.registerCommand("IndigoRunner.tests.displayTree", () => displayTestsTree("Tree"))
-  let displayTagTestsTreeCommand = vscode.commands.registerCommand("IndigoRunner.tests.displayTag", () => displayTestsTree("Tag"))
-  let openReportCommand = vscode.commands.registerCommand("IndigoRunner.reports.open", openExternalUri)
-  let refreshReportsTreeCommand = vscode.commands.registerCommand("IndigoRunner.reports.refreshTree", () => reportsProvider.refresh())
-  let refreshTestsTreeCommand = vscode.commands.registerCommand("IndigoRunner.tests.refreshTree", () => karateTestsProvider.refresh())
-  let filterReportsTreeCommand = vscode.commands.registerCommand("IndigoRunner.reports.filterTree", () => filterReportsTree(context))
-  let filterTestsTreeCommand = vscode.commands.registerCommand("IndigoRunner.tests.filterTree", () => filterTestsTree(context))
-  let clearResultsCommand = vscode.commands.registerCommand("IndigoRunner.tests.clearResults", () => {
+  context.subscriptions.push(resultsProvider)
+
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.remote.refresh, () => remoteProjectProvider.reresh()))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.remote.open, (project: Project) => commands.openRemoteProject(project)))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.paste, commands.smartPaste))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.getDebugFile, commands.getDebugFile))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.getDebugBuildFile, commands.getDebugBuildFile))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.tests.debug, commands.debugKarateTest))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.tests.debugAll, commands.debugKarateTest))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.tests.run, commands.runKarateTest))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.tests.runAll, commands.runAllKarateTests))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.tests.runTag, commands.runTagKarateTests))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.reports.displayList, () => commands.displayReportsTree("List")))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.reports.displayTree, () => commands.displayReportsTree("Tree")))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.tests.displayList, () => commands.displayTestsTree("List")))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.tests.displayTree, () => commands.displayTestsTree("Tree")))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.tests.displayTag, () => commands.displayTestsTree("Tag")))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.reports.open, commands.openExternalUri))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.reports.refreshTree, () => reportsProvider.refresh()))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.tests.refreshTree, () => karateTestsProvider.refresh()))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.reports.filterTree, () => commands.filterReportsTree(context)))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.tests.filterTree, () => commands.filterTestsTree(context)))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.tests.clearResults, () => {
     karateTestsProvider.clearResults()
     decorationsProvider.triggerUpdateDecorations()
     StatusBarProvider.reset()
-  })
-  let openSettingsCommand = vscode.commands.registerCommand("IndigoRunner.tests.openSettings", openKarateSettings)
-  let toggleResultsInGutterCommand = vscode.commands.registerCommand("IndigoRunner.editor.toggleResultsInGutter", toggleResultsInGutter)
-  let openFileCommand = vscode.commands.registerCommand("IndigoRunner.tests.open", openFileInEditor)
-  let registerDebugAdapterProvider = vscode.debug.registerDebugAdapterDescriptorFactory('karate', debugAdapterProvider)
-  let registerDebugConfigurationProvider = vscode.debug.registerDebugConfigurationProvider('karate', debugConfigurationProvider)
-  let registerCodeLensProvider = vscode.languages.registerCodeLensProvider(karateFile, codeLensProvider)
-  let registerDefinitionProvider = vscode.languages.registerDefinitionProvider(karateFile, definitionProvider)
-  let registerHoverRunDebugProvider = vscode.languages.registerHoverProvider(karateFile, hoverRunDebugProvider)
-  let registerCompletionItemProvider = vscode.languages.registerCompletionItemProvider(karateFile, completionItemProvider, ...['\'', '\"'])
-  //let registerFoldingRangeProvider = vscode.languages.registerFoldingRangeProvider(karateFile, foldingRangeProvider)
+  }))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.openSettings, commands.openSettings))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.editor.toggleResultsInGutter, commands.toggleResultsInGutter))
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.tests.open, commands.openFileInEditor))
+
+
+  context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('karate', debugAdapterProvider))
+  context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('karate', debugConfigurationProvider))
+  context.subscriptions.push(vscode.languages.registerCodeLensProvider(karateFile, codeLensProvider))
+  context.subscriptions.push(vscode.languages.registerDefinitionProvider(karateFile, definitionProvider))
+  context.subscriptions.push(vscode.languages.registerHoverProvider(karateFile, hoverRunDebugProvider))
+  context.subscriptions.push(vscode.languages.registerCompletionItemProvider(karateFile, completionItemProvider, ...['\'', '\"']))
+  //context.subscriptions.push(vscode.languages.registerFoldingRangeProvider(karateFile, foldingRangeProvider))
+
+  context.subscriptions.push(vscode.window.registerTreeDataProvider('indigo-remote', remoteProjectProvider))
 
   createTreeViewWatcher(
     reportsWatcher,
@@ -124,12 +124,10 @@ export function activate(context: vscode.ExtensionContext) {
         reportsProvider
       )
     }
-
     let karateTestsDisplayType = e.affectsConfiguration("IndigoRunner.tests.activityBarDisplayType")
     let karateTestsHideIgnored = e.affectsConfiguration("IndigoRunner.tests.hideIgnored")
     let karateTestsToTargetByGlob = e.affectsConfiguration("IndigoRunner.tests.toTargetByGlob")
     let karateTestsToTargetByTag = e.affectsConfiguration("IndigoRunner.tests.toTargetByTag")
-
     if (karateTestsDisplayType || karateTestsHideIgnored || karateTestsToTargetByTag) {
       karateTestsProvider.refresh()
     }
@@ -147,36 +145,6 @@ export function activate(context: vscode.ExtensionContext) {
     }
   })
 
-  context.subscriptions.push(smartPasteCommand)
-  context.subscriptions.push(getDebugFileCommand)
-  context.subscriptions.push(getDebugBuildFileCommand)
-  context.subscriptions.push(debugTestCommand)
-  context.subscriptions.push(debugAllCommand)
-  context.subscriptions.push(runTestCommand)
-  context.subscriptions.push(runAllCommand)
-  context.subscriptions.push(runTagCommand)
-  context.subscriptions.push(displayListReportsTreeCommand)
-  context.subscriptions.push(displayTreeReportsTreeCommand)
-  context.subscriptions.push(displayListTestsTreeCommand)
-  context.subscriptions.push(displayTreeTestsTreeCommand)
-  context.subscriptions.push(displayTagTestsTreeCommand)
-  context.subscriptions.push(openReportCommand)
-  context.subscriptions.push(refreshReportsTreeCommand)
-  context.subscriptions.push(refreshTestsTreeCommand)
-  context.subscriptions.push(filterReportsTreeCommand)
-  context.subscriptions.push(filterTestsTreeCommand)
-  context.subscriptions.push(clearResultsCommand)
-  context.subscriptions.push(openSettingsCommand)
-  context.subscriptions.push(toggleResultsInGutterCommand)
-  context.subscriptions.push(openFileCommand)
-  context.subscriptions.push(registerDebugAdapterProvider)
-  context.subscriptions.push(registerDebugConfigurationProvider)
-  context.subscriptions.push(registerCodeLensProvider)
-  context.subscriptions.push(registerDefinitionProvider)
-  context.subscriptions.push(resultsProvider)
-  context.subscriptions.push(registerHoverRunDebugProvider)
-  context.subscriptions.push(registerCompletionItemProvider)
-  //context.subscriptions.push(registerFoldingRangeProvider)
 }
 
 export function deactivate() {

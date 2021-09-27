@@ -15,8 +15,12 @@ export class ProjectService extends BaseService {
     return this.http.put<ApiRes<string>>(`${this.API_BASE}/project`, item)
   }
 
+  search(workspace: string, params: QueryProject = {}) {
+    return this.http.post<ApiRes<Project[]>>(`${this.API_BASE}/project/${workspace}/search`, params)
+  }
+
 }
 
 export interface QueryProject {
-  creator?: string
+  workspace?: string
 }

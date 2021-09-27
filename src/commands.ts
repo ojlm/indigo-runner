@@ -13,10 +13,12 @@ import {
   IProjectDetail,
   ITestExecutionDetail,
 } from './helper'
+import logger from './logger'
 import ExecutionsProvider from './providers/executions.provider'
 import KarateTestsProvider from './providers/karate-tests.provider'
 import ReportsProvider from './providers/reports.provider'
 import StatusBarProvider from './providers/status-bar.provider'
+import { Project } from './remote/model/ide.model'
 import { ENTRY_TYPE } from './types/entry'
 
 let debugLineNumber: number = 0
@@ -549,7 +551,7 @@ function openFileInEditor(args) {
   }
 }
 
-function openKarateSettings() {
+function openSettings() {
   vscode.commands.executeCommand('workbench.action.openSettings', 'Indigo Runner')
   vscode.commands.executeCommand('workbench.action.openWorkspaceSettings')
 }
@@ -557,6 +559,10 @@ function openKarateSettings() {
 function toggleResultsInGutter() {
   let value = Boolean(vscode.workspace.getConfiguration('IndigoRunner.editor').get('toggleResultsInGutter'))
   vscode.workspace.getConfiguration().update('IndigoRunner.editor.toggleResultsInGutter', !value)
+}
+
+function openRemoteProject(project: Project) {
+  logger.info(`open: ${project.workspace}/${project.name}`)
 }
 
 export {
@@ -574,6 +580,7 @@ export {
   openExternalUri,
   openExternalUrl,
   openFileInEditor,
-  openKarateSettings,
-  toggleResultsInGutter
+  openSettings,
+  toggleResultsInGutter,
+  openRemoteProject,
 }

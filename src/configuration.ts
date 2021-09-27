@@ -26,31 +26,31 @@ export class IndigoRunnerConfiguration {
 
   private constructor() {
     vscode.workspace.onDidChangeConfiguration(e => {
-      this.init()
+      this.update()
       if (e.affectsConfiguration('IndigoRunner.remote')) {
         this.remoteConfigurationUpdateEventEmitter.fire()
       }
     })
-    this.init()
+    this.update()
   }
 
-  private init() {
+  public update() {
     const config = vscode.workspace.getConfiguration(IndigoRunnerConfiguration.ROOT)
     switch (config.get<string>('logLevel', 'info')) {
       case 'error':
-        this.logLevel = LogLevel.Error
+        this.logLevel = LogLevel.ERROR
         break
       case 'warn':
-        this.logLevel = LogLevel.Warn
+        this.logLevel = LogLevel.WARN
         break
       case 'info':
-        this.logLevel = LogLevel.Info
+        this.logLevel = LogLevel.INFO
         break
       case 'verbose':
-        this.logLevel = LogLevel.Verbose
+        this.logLevel = LogLevel.VERBOSE
         break
       default:
-        this.logLevel = LogLevel.Info
+        this.logLevel = LogLevel.INFO
         break
     }
     this.remoteEnabled = config.get<boolean>('remote.enabled', true)

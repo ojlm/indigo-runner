@@ -1,5 +1,6 @@
 import * as vscode from 'vscode'
 
+import { RunnerCommands } from '../../commaon/constants'
 import { Project, Workspace } from '../model/ide.model'
 import { RemoteProviders } from '../remote-providers'
 
@@ -16,19 +17,41 @@ export class RemoteProjectProvider implements vscode.TreeDataProvider<RemoteProj
   }
 
   getTreeItem(element: RemoteProjectNode): vscode.TreeItem | Thenable<vscode.TreeItem> {
-    throw new Error('Method not implemented.');
+    if (element.workspace) {
+      return {
+        label: element.workspace.alias || element.workspace.name,
+        collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
+      } as vscode.TreeItem
+    } else {
+      return {
+        command: {
+          command: RunnerCommands.remote.open,
+          arguments: [element.project],
+        },
+        label: element.project.alias || element.project.name,
+        collapsibleState: vscode.TreeItemCollapsibleState.None,
+      } as vscode.TreeItem
+    }
   }
 
   getChildren(element?: RemoteProjectNode): vscode.ProviderResult<RemoteProjectNode[]> {
-    throw new Error('Method not implemented.');
+    if (element && element.workspace) {
+      return this.remote.projectService.search(element.workspace.name).then(res => {
+        return res.data.list.map(item => ({ project: item } as RemoteProjectNode))
+      })
+    } else {
+      return this.remote.workspaceService.getWorkspaces().then(res => {
+        return res.data.list.map(item => ({ workspace: item } as RemoteProjectNode))
+      })
+    }
   }
 
-  getParent?(element: RemoteProjectNode): vscode.ProviderResult<RemoteProjectNode> {
-    throw new Error('Method not implemented.');
-  }
-
-  resolveTreeItem?(item: vscode.TreeItem, element: RemoteProjectNode, token: vscode.CancellationToken): vscode.ProviderResult<vscode.TreeItem> {
-    throw new Error('Method not implemented.');
+  getParent(element: RemoteProjectNode): vscode.ProviderResult<RemoteProjectNode> {
+    if (element.project) {
+      return this.remote.workspaceService.getById(element.project.workspace).then(res => ({ workspace: res.data } as RemoteProjectNode))
+    } else {
+      return null
+    }
   }
 
 }

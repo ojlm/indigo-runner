@@ -3,10 +3,10 @@ import { OutputChannel, window } from 'vscode'
 import { IndigoRunnerConfiguration } from './configuration'
 
 export enum LogLevel {
-  Verbose,
-  Info,
-  Warn,
-  Error,
+  VERBOSE,
+  INFO,
+  WARN,
+  ERROR,
 }
 
 class Logger {
@@ -26,19 +26,19 @@ class Logger {
   }
 
   public verbose(message: string, data?: any): void {
-    this.log(LogLevel.Verbose, message, data)
+    this.log(LogLevel.VERBOSE, message, data)
   }
 
   public info(message: string, data?: any): void {
-    this.log(LogLevel.Info, message, data)
+    this.log(LogLevel.INFO, message, data)
   }
 
   public warn(message: string, data?: any): void {
-    this.log(LogLevel.Warn, message, data)
+    this.log(LogLevel.WARN, message, data)
   }
 
   public error(message: string, data?: any): void {
-    this.log(LogLevel.Error, message, data)
+    this.log(LogLevel.ERROR, message, data)
   }
 
   public log(level: LogLevel, message: string, data?: any): void {
