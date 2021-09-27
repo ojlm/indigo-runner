@@ -3,7 +3,6 @@ import * as vscode from 'vscode'
 import * as commands from './commands'
 import { RunnerCommands } from './commaon/constants'
 import { createTreeViewWatcher } from './helper'
-import logger from './logger'
 import CodeLensProvider from './providers/code-lens.provider'
 import CompletionItemProvider from './providers/completion-item.provider'
 import DebugAdapterProvider from './providers/debug-adapter.provider'
@@ -16,9 +15,7 @@ import KarateTestsProvider from './providers/karate-tests.provider'
 import ReportsProvider from './providers/reports.provider'
 import { ResultsProvider } from './providers/results.provider'
 import StatusBarProvider from './providers/status-bar.provider'
-import { Project } from './remote/model/ide.model'
-import { RemoteProjectProvider } from './remote/providers/remote-project.provider'
-import { RemoteProviders } from './remote/remote-providers'
+import { RemoteExplorer } from './remote/remote-explorer'
 
 //import ProviderFoldingRange from "./providerFoldingRange"
 
@@ -26,10 +23,7 @@ let reportsWatcher = null
 let karateTestsWatcher = null
 
 export function activate(context: vscode.ExtensionContext) {
-  const remoteProviders = new RemoteProviders(context)
-  const remoteProjectProvider = new RemoteProjectProvider(remoteProviders)
-  remoteProviders.http.onDidChangeClient(() => remoteProjectProvider.reresh())
-  logger.show()
+  new RemoteExplorer(context)
 
   //showWhatsNew(context)
   let resultsProvider = new ResultsProvider()
@@ -49,9 +43,6 @@ export function activate(context: vscode.ExtensionContext) {
   let karateFile = { language: "karate", scheme: "file" }
 
   context.subscriptions.push(resultsProvider)
-
-  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.remote.refresh, () => remoteProjectProvider.reresh()))
-  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.remote.open, (project: Project) => commands.openRemoteProject(project)))
   context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.paste, commands.smartPaste))
   context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.getDebugFile, commands.getDebugFile))
   context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.getDebugBuildFile, commands.getDebugBuildFile))
@@ -87,8 +78,6 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(vscode.languages.registerHoverProvider(karateFile, hoverRunDebugProvider))
   context.subscriptions.push(vscode.languages.registerCompletionItemProvider(karateFile, completionItemProvider, ...['\'', '\"']))
   //context.subscriptions.push(vscode.languages.registerFoldingRangeProvider(karateFile, foldingRangeProvider))
-
-  context.subscriptions.push(vscode.window.registerTreeDataProvider('indigo-remote', remoteProjectProvider))
 
   createTreeViewWatcher(
     reportsWatcher,

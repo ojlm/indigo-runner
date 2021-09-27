@@ -13,12 +13,10 @@ import {
   IProjectDetail,
   ITestExecutionDetail,
 } from './helper'
-import logger from './logger'
 import ExecutionsProvider from './providers/executions.provider'
 import KarateTestsProvider from './providers/karate-tests.provider'
 import ReportsProvider from './providers/reports.provider'
 import StatusBarProvider from './providers/status-bar.provider'
-import { Project } from './remote/model/ide.model'
 import { ENTRY_TYPE } from './types/entry'
 
 let debugLineNumber: number = 0
@@ -561,10 +559,6 @@ function toggleResultsInGutter() {
   vscode.workspace.getConfiguration().update('IndigoRunner.editor.toggleResultsInGutter', !value)
 }
 
-function openRemoteProject(project: Project) {
-  logger.info(`open: ${project.workspace}/${project.name}`)
-}
-
 export {
   smartPaste,
   getDebugFile,
@@ -582,5 +576,4 @@ export {
   openFileInEditor,
   openSettings,
   toggleResultsInGutter,
-  openRemoteProject,
 }
