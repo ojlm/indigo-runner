@@ -2,14 +2,14 @@ import * as vscode from 'vscode'
 
 import { RunnerCommands } from '../../commaon/constants'
 import { Project, Workspace } from '../model/ide.model'
-import { RemoteProviders } from '../remote-providers'
+import { RemoteExplorer } from '../remote-explorer'
 
 export class RemoteProjectProvider implements vscode.TreeDataProvider<RemoteProjectNode>  {
 
   private _onDidChangeTreeData = new vscode.EventEmitter<void>()
   readonly onDidChangeTreeData: vscode.Event<void | RemoteProjectNode> = this._onDidChangeTreeData.event
 
-  constructor(private remote: RemoteProviders) {
+  constructor(private remote: RemoteExplorer) {
   }
 
   reresh() {
