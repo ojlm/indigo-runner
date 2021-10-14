@@ -3,6 +3,7 @@ import * as vscode from 'vscode'
 import * as commands from './commands'
 import { RunnerCommands } from './commaon/constants'
 import { createTreeViewWatcher } from './helper'
+import logger from './logger'
 import CodeLensProvider from './providers/code-lens.provider'
 import CompletionItemProvider from './providers/completion-item.provider'
 import DebugAdapterProvider from './providers/debug-adapter.provider'
@@ -43,6 +44,7 @@ export function activate(context: vscode.ExtensionContext) {
   let karateFile = { language: "karate", scheme: "file" }
 
   context.subscriptions.push(resultsProvider)
+  context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.openConsole, () => logger.show()))
   context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.paste, commands.smartPaste))
   context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.getDebugFile, commands.getDebugFile))
   context.subscriptions.push(vscode.commands.registerCommand(RunnerCommands.getDebugBuildFile, commands.getDebugBuildFile))

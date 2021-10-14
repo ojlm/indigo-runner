@@ -30,6 +30,7 @@
   "activationEvents": [
     "onLanguage:karate",
     "onLanguage:javascript",
+    "onFileSystem:indigo",
     "onView:indigo-remote",
     "onView:indigo-tests",
     "onView:indigo-reports"
@@ -88,6 +89,11 @@
           "light": "resources/light/gear.svg",
           "dark": "resources/dark/gear.svg"
         },
+        "category": "Indigo"
+      },
+      {
+        "command": "IndigoRunner.openConsole",
+        "title": "Open Console",
         "category": "Indigo"
       },
       {

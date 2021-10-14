@@ -1,4 +1,5 @@
 export const RunnerCommands = {
+  openConsole: 'IndigoRunner.openConsole',
   openSettings: 'IndigoRunner.openSettings',
   paste: 'IndigoRunner.paste',
   getDebugFile: 'IndigoRunner.getDebugFile',
